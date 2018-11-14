@@ -168,7 +168,6 @@ fn decode_methods(methods_str: String) -> Vec<Method>{
                                                   method_components[4].to_string(), decode_parameters(method_components[5].to_string())));
         }
     }
-
     return class_methods_return;
 }
 
@@ -247,7 +246,6 @@ pub fn decode_input(){
         if class_relation_vec.len() > 1 {
             relation_list = decode_relations(class_relation_vec[1].to_string());
         }
-
     }
 
     print_classes(class_list);
