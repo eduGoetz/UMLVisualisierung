@@ -1,0 +1,12 @@
+[package]
+name = "conrod_hw"
+version = "0.1.0"
+authors = ["Lorenzo <pc13@live.de>"]
+
+[dependencies]
+conrod = { version = "0.55.0", features = ["glium", "winit"] }
+piston_window = "0.51.1"
+find_folder = "0.3.0"
+image = "0.19"
+rand = "0.5"
+

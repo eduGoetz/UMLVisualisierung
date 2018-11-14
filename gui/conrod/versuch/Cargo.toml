@@ -1,0 +1,7 @@
+[package]
+name = "gui"
+version = "0.1.0"
+authors = ["Lorenzo <pc13@live.de>"]
+
+[dependencies]
+conrod = { version = "0.55.0", features = ["glium", "winit"] }
