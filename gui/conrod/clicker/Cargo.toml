@@ -1,0 +1,9 @@
+[package]
+name = "rustclicker"
+version = "0.1.0"
+authors = ["Lorenzo <pc13@live.de>"]
+
+[dependencies]
+conrod = "0.55.0"
+find_folder = "0.3.0" 
+piston_window = "0.32"
