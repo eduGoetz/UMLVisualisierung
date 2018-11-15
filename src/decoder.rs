@@ -234,7 +234,7 @@ pub fn decode_input(){
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
     let input =
-        "1;Class;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort/2;Class;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort|V;2->1;"
+        "1;Clagfggfg;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort/2;Class;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort|V;2->1;"
             .to_string();
     let mut class_list = Vec::new();
     let mut relation_list = Vec::new();
@@ -261,3 +261,8 @@ fn print_classes(classes: Vec<Class>){
     }
 }
 
+//gui fertig
+//tests
+//templates
+//imageproc
+//Fehlermeldung bei falscheingabe
