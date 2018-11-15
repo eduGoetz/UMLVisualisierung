@@ -5,3 +5,7 @@ authors = ["egoetz <eduard.goetz@fh-bielefeld.de>"]
 
 [dependencies]
 regex = "0.2"
+
+[dependencies.gtk]
+features = ["v3_22"]
+version = "0.2.0"

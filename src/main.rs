@@ -1,9 +1,12 @@
 extern crate regex;
+extern crate gtk;
 use regex::Regex;
+use gtk::*;
 
 mod decoder;
+mod gui;
 
 fn main() {
 
-    decoder::decode_input();
+    gui::gui_main();
 }

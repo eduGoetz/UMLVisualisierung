@@ -230,12 +230,10 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
     return relations_return;
 }
 
-pub fn decode_input(){
+pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>){
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
-    let input =
-        "1;Class;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort/2;Class;Main;public:static::int:number;private:static::void:getNumber:int=number String=wort|V;2->1;"
-            .to_string();
+    let input = given_input.to_string();
     let mut class_list = Vec::new();
     let mut relation_list = Vec::new();
 
@@ -248,16 +246,20 @@ pub fn decode_input(){
         }
     }
 
-    print_classes(class_list);
+    return (class_list, relation_list);
+
+    /*print_classes(class_list);
 
     for i in relation_list {
         println!("{:?}", i);
-    }
+    }*/
 }
 
-fn print_classes(classes: Vec<Class>){
+fn print_classes(classes: Vec<Class>) -> String{
+    let all_classes: String;
     for i in &classes {
-        println!("{:?}", i);
+        all_classes = all_classes + i.to_string() + "\n";
     }
+    return all_classes;
 }
 
