@@ -16,8 +16,8 @@ pub struct Header {
 
 pub struct Content {
     pub container: Paned,
-    pub left_pane: TextBuffer,
-    pub input: Entry,
+    pub left_pane: Image,
+    pub input: TextBuffer,
     pub start_button: Button,
 }
 
@@ -62,28 +62,27 @@ impl Content {
         let container = Paned::new(Orientation::Horizontal);
         let right_pane = Box::new(Orientation::Vertical, 3);
 
-        let left_pane = TextBuffer::new(None);
-        let left_pane_view = TextView::new_with_buffer(&left_pane);
+        let left_pane = Image::new_from_file("");
 
-        let input = Entry::new();
-        input.set_placeholder_text("Eingabe");
+        let input = TextBuffer::new(None);
+        let input_view = TextView::new_with_buffer(&input);
+        //input.set_placeholder_text("Eingabe");
 
         let start_button = Button::new_with_label("Los");
         start_button.get_style_context().map(|c| c.add_class("suggested-action"));
 
-        left_pane_view.set_editable(false);
-        left_pane_view.set_wrap_mode(WrapMode::Word);
 
-        let left_pane_scrolled = ScrolledWindow::new(None, None);
-        left_pane_scrolled.add(&left_pane_view);
+        input_view.set_editable(true);
+        input_view.set_wrap_mode(WrapMode::Word);
+
+        let input_scrolled = ScrolledWindow::new(None, None);
+        input_scrolled.add(&input_view);
 
         right_pane.set_border_width(5);
-        right_pane.pack_start(&input, false, true, 0);
+        right_pane.pack_start(&input_scrolled, true, true, 0);
         right_pane.pack_start(&start_button, false, true, 0);
 
-
-        //container.pack1(&left_pane, true, true);
-        container.pack1(&left_pane_scrolled, true, true);
+        container.pack1(&left_pane, true, true);
         container.pack2(&right_pane, true, true);
 
         Content { container, left_pane, input, start_button }
@@ -102,13 +101,10 @@ pub fn gui_main() {
     {
         let input = gui.content.input.clone();
         let left_pane = gui.content.left_pane.clone();
-        let (class_list, relation_list) = decoder::decode_input(input.get_text().unwrap());
+        //let (class_list, relation_list) = decoder::decode_input(input.get_text().unwrap());
 
         gui.content.start_button.connect_clicked(move |_| {
-            for i in class_list {
-                left_pane.set_text((get_current_buffer(&left_pane).as_ref()));
-                left_pane.set_text(i.to_string().as_ref());
-            }
+            let (class_list, relation_list) = decoder::decode_input(get_current_input(&input));
         });
     }
 
@@ -117,8 +113,8 @@ pub fn gui_main() {
     gtk::main();
 }
 
-fn get_current_buffer(buffer: &TextBuffer) -> String {
+fn get_current_input(buffer: &TextBuffer) -> String {
     let start = buffer.get_start_iter();
     let end = buffer.get_end_iter();
-    buffer.get_text(&start, &end, true).to_string();
+    return buffer.get_text(&start, &end, true).unwrap();
 }

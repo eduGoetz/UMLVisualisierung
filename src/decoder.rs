@@ -96,7 +96,7 @@ enum RelationType{
 
 
 fn decode_classes(classes_str: String) -> Vec<Class>{
-    let classes_regex = Regex::new(r"(\d+;((Class)|(Interface));(\w+);(.*);(.*)(\\?))+").unwrap();
+    let classes_regex = Regex::new(r"(\d+;((Class)|(Interface));(\w+);(.*);(.*)(/?))+").unwrap();
 
     let mut class_list_return = Vec::new();
     let classes_strings = classes_str.split("/");
@@ -246,20 +246,14 @@ pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>){
         }
     }
 
-    return (class_list, relation_list);
-
-    /*print_classes(class_list);
-
-    for i in relation_list {
-        println!("{:?}", i);
-    }*/
-}
-
-fn print_classes(classes: Vec<Class>) -> String{
-    let all_classes: String;
-    for i in &classes {
-        all_classes = all_classes + i.to_string() + "\n";
+    for j in &class_list {
+        println!("{:?}", j);
     }
-    return all_classes;
+
+    for i in &relation_list {
+        println!("{:?}", i);
+    }
+
+    return (class_list, relation_list);
 }
 
