@@ -1,0 +1,11 @@
+[package]
+name = "imageproc"
+version = "0.1.0"
+authors = ["Lorenzo <pc13@live.de>"]
+
+[dependencies]
+image = "*"
+imageproc = "0.16.0"
+rusttype = "0.7"
+conv = "0.3.1"
+io = "0.0.2"
