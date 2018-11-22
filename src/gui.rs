@@ -3,6 +3,7 @@ use gtk::*;
 use std::process;
 
 use decoder;
+use visuals;
 
 pub struct UmlGUI {
     pub window: Window,
@@ -26,7 +27,7 @@ impl UmlGUI {
     fn new() -> UmlGUI {
         let window = Window::new(WindowType::Toplevel);
         let header = Header::new();
-        let content = Content::new();
+        let mut content = Content::new();
 
         window.set_titlebar(&header.container);
         window.set_title("UML Visualisierung");
@@ -62,7 +63,7 @@ impl Content {
         let container = Paned::new(Orientation::Horizontal);
         let right_pane = Box::new(Orientation::Vertical, 3);
 
-        let left_pane = Image::new_from_file("");
+        let mut left_pane = Image::new();
 
         let input = TextBuffer::new(None);
         let input_view = TextView::new_with_buffer(&input);
@@ -88,6 +89,10 @@ impl Content {
         Content { container, left_pane, input, start_button }
 
     }
+
+    fn refresh_image(&mut self){
+        self.left_pane = Image::new_from_file("res/UML_visual_result.png");
+    }
 }
 
 pub fn gui_main() {
@@ -96,15 +101,16 @@ pub fn gui_main() {
         process::exit(1);
     }
 
-    let gui = UmlGUI::new();
-
+    let mut gui = UmlGUI::new();
     {
         let input = gui.content.input.clone();
-        let left_pane = gui.content.left_pane.clone();
+        let mut left_pane = gui.content.left_pane.clone();
         //let (class_list, relation_list) = decoder::decode_input(input.get_text().unwrap());
 
         gui.content.start_button.connect_clicked(move |_| {
             let (class_list, relation_list) = decoder::decode_input(get_current_input(&input));
+            call_class_draw(class_list);
+            gui.content.refresh_image();
         });
     }
 
@@ -117,4 +123,8 @@ fn get_current_input(buffer: &TextBuffer) -> String {
     let start = buffer.get_start_iter();
     let end = buffer.get_end_iter();
     return buffer.get_text(&start, &end, true).unwrap();
+}
+
+fn call_class_draw(class_list: Vec<decoder::Class>){
+        visuals::klasse("klassenname","agg","attributwert","methodenwert");
 }
