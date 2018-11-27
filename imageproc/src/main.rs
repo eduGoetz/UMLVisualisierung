@@ -14,10 +14,12 @@ use rusttype::{Font, Scale, point, PositionedGlyph};
 
 use std::path::Path;
 use std::env;
+use std::fs::File;
 use std::io::*;
-use image::{Rgb};//, RgbImage};
+use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 
+use image::GenericImageView;
 /// Draws colored text on an image in place. `scale` is augmented font scaling on both the x and y axis (in pixels). Note that this function *does not* support newlines, you must do this manually
 
 pub fn draw_text_mut<'a, I>(
@@ -82,62 +84,162 @@ where
 
 
 
-
-
-
-
-
-
 fn main() {
-
-	klasse("klassenname","agg","attributwert","methodenwert");
-
-}
-	
-fn klasse(ueberschrift: &str,pfeil: &str,attribut: &str, methode: &str) {	
-
-
-
-    let mut image = ImageBuffer::<Rgb<u8>, Vec<u8> >::new(1000, 1000);//image = RgbImage::new(200, 200);
+	/*let mut image = ImageBuffer::<Rgb<u8>, Vec<u8> >::new(1000, 1000);//image = RgbImage::new(200, 200);
 	//png datei wird erstellt
     image.save("UML.png").unwrap();
 	let arg = "UML.png";
     let path = Path::new(&arg);//der pfad zum bild welcher direkt in der cmd angegeben wird
+	
+	//bild weiß machen falls es nicht weiß ist
+	for a in 0..1000 {
+		for b in 0..1000 {
+		image.get_pixel_mut(a,b).data=[255,255,255];
+		}
+	}	*/
+	
+	
 
-	//hier tabelle zeichnen
+	/*    let arg = if env::args().count() == 2 {
+            env::args().nth(1).unwrap()
+        } else {
+            panic!("Please enter a target file path")
+        };
+
+    let path = Path::new(&arg);*/
+	
+	
+	/*    let file = if env::args().count() == 2 {
+        env::args().nth(1).unwrap()
+    } else {
+        panic!("Please enter a file")
+    };*/
+
+	
+	//let image = image::open("test.jpg").unwrap();
+	//let image = image::open(&Path::new(&file)).unwrap();
+	
+
+	let mut image = ImageBuffer::<Rgb<u8>, Vec<u8> >::new(1000, 1000);//image = RgbImage::new(200, 200);
+	//png datei wird erstellt
+    image.save("daten/UML.png").unwrap();
+	let arg = "daten/UML.png";
+    let path = Path::new(&arg);//der pfad zum bild welcher direkt in der cmd angegeben wird
+	
 	//bild weiß machen falls es nicht weiß ist
 	for a in 0..1000 {
 		for b in 0..1000 {
 		image.get_pixel_mut(a,b).data=[255,255,255];
 		}
 	}
-
-		
 	
-	println!("kontrollausgabe = {},{},{},{}", ueberschrift,pfeil,attribut,methode);
+	
+
+				let mut vec_attributea = Vec::new();
+				vec_attributea.push("Das");
+				vec_attributea.push("hier");
+				vec_attributea.push("sind");
+				vec_attributea.push("Attribute");
+				
+				
+				let mut vec_methodea = Vec::new();
+				vec_methodea.push("Das");
+				vec_methodea.push("hier");
+				vec_methodea.push("sind");
+				vec_methodea.push("Methoden");
+	
+	
+	
+				let mut vec_attributeb = Vec::new();
+				vec_attributeb.push("Attribute");
+				vec_attributeb.push("sind");
+				vec_attributeb.push("hier");
+				vec_attributeb.push("Das");
+				
+				
+				let mut vec_methodeb = Vec::new();
+				vec_methodeb.push("methode");
+				vec_methodeb.push("sind");
+				vec_methodeb.push("hier");
+				vec_methodeb.push("das");
+				
+				
+				let mut vec_attributec = Vec::new();
+				vec_attributec.push("fdsa");
+				vec_attributec.push("fdsa");
+				vec_attributec.push("hfgdr");
+				vec_attributec.push("Dgfdsas");
+				
+				let mut vec_methodec = Vec::new();
+				vec_methodec.push("tes");
+				vec_methodec.push("fds");
+				vec_methodec.push("fds");
+				vec_methodec.push("asdf");
+				
+				
+	
+	//es müssen der klassenname,Pfeilart,das bild,der pfad zum bild,die zahl bei welcher klasse er ist,vektor für attribute,vektor für methoden
+	
+	let mut tuple=klasse("klassenname","imple",image,path,3,vec_attributea,vec_methodea,"unten");
+	//tuple=klasse("klassenname","abh",tuple.0,path,tuple.1,vec_attributeb,vec_methodeb);
+	tuple=klasse("klassenname","ver",tuple.0,path,7,vec_attributec,vec_methodec,"rechts");
+
+	
+}
+	
+pub fn klasse(ueberschrift: &str,pfeil: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: Vec<&str>,vec_methode: Vec<&str>,richtung: &str)
+->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,i32) {
+	
 		let mut eingabe_ueberschift=ueberschrift;
 		let mut eingabe_pfeil=pfeil;
-		let mut eingabe_attribut=attribut;
-		let mut eingabe_methode=methode;
-	
-
-		let mut anzahl=0;
+		let mut file=file;
+		let mut image=image;	
+		let mut anzahl=anzahl;
 		//erster wert sagt die höhe aus in y
 		//erster wert bei get pixel sagt die höhe in x
 		let mut erster_wert=30;
 		let mut zweiter_wert=180;
 		let mut erster_wert_x=30;
 		let mut zweiter_wert_x=180;
-		let mut fertig=false;
 		let mut ab = erster_wert;
+		
+		let mut fertig=false;
 		let mut done = false; 
 		let mut zeile=1;
-		//pfeile
-		let mut pfeil_hoehe=100;
-		//eingabe = pfeil art
+		let mut pfeil_hoehe=zweiter_wert-erster_wert;
 		let mut eingabe = eingabe_pfeil;
-		let mut pfeil_schr=100; 
-		//let mut ende_linie=0;
+		let mut pfeil_schr=pfeil_hoehe;
+		let mut pfeil_richtung=richtung; 		
+		
+		let mut vec_attribute=vec_attribute;
+		let mut vec_methode=vec_methode;
+
+		let mut tuple= zeichne_klasse(anzahl,"",image);
+		
+		image=zeichne_schrift(tuple.0,eingabe_ueberschift,vec_attribute,vec_methode,tuple.1,tuple.2,tuple.3,anzahl);
+		image=zeichne_pfeil(image,eingabe,tuple.1,tuple.2,tuple.3,tuple.4,anzahl,pfeil_richtung);
+		let  _ = image.save(file).unwrap();
+		anzahl=anzahl+1;
+		return(image,anzahl);
+
+
+}
+
+fn zeichne_klasse(anzahl: i32,eingabe: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,u32,u32,u32,u32){
+		let mut erster_wert=30;
+		let mut zweiter_wert=180;
+		let mut erster_wert_x=30;
+		let mut zweiter_wert_x=180;
+		let mut mitte_unterseite_x=zweiter_wert_x-erster_wert_x;
+		let mut mitte_unterseite_y;
+		let mut done = false; 
+		let mut ab = erster_wert;
+		let mut zeile=1;
+		let mut fertig=false;
+		let mut eingabe=eingabe;
+		let mut anzahl=anzahl;
+		let mut image=image;	
+		
 		
 		while !fertig { 	
 			if anzahl == 1{
@@ -145,28 +247,72 @@ fn klasse(ueberschrift: &str,pfeil: &str,attribut: &str, methode: &str) {
 				zweiter_wert=180;
 				erster_wert_x=280;
 				zweiter_wert_x=430;
-				eingabe="";
+				
+				//eingabe="";
 			}
 			if anzahl == 2{
 				erster_wert=30;
 				zweiter_wert=180;
 				erster_wert_x=530;
 				zweiter_wert_x=680;
-				eingabe="";
+				//eingabe="";
 			}
 			if anzahl == 3{
 				erster_wert=30;
 				zweiter_wert=180;
 				erster_wert_x=780;
 				zweiter_wert_x=930;
+				//eingabe="";	
+			}
+			if anzahl == 4{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=780;
+				zweiter_wert_x=930;
+				//eingabe="";
+			}
+			if anzahl == 5{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=530;
+				zweiter_wert_x=680;
+				//eingabe="";
+			}
+
+			if anzahl == 6{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+				//eingabe="";
+			}
+			if anzahl == 7{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+				//eingabe="";
+			}
+			if anzahl == 8{
+				erster_wert=570;
+				zweiter_wert=620;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+				//eingabe="";
+			}
+			if anzahl == 9{
+				erster_wert=570;
+				zweiter_wert=620;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+				//eingabe="";
 			}
 			//tabelle zeichnen
-			
-			
 			//senkrechte striche
 			for d in erster_wert..zweiter_wert {
 				image.get_pixel_mut(erster_wert_x,d).data=[0,0,0];
 				image.get_pixel_mut(zweiter_wert_x,d).data=[0,0,0];
+
 			}
 			
 			
@@ -184,37 +330,107 @@ fn klasse(ueberschrift: &str,pfeil: &str,attribut: &str, methode: &str) {
 				}
 				zeile=zeile+1;
 				if ab > zweiter_wert {
+					mitte_unterseite_y=ab;
+					println!("{}",mitte_unterseite_y);
 					zeile=1;
 					done = true;
+					fertig=true;
 				}
 			}
+	}
+
+	return (image,erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x);
+	
+}
 
 
+fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_attribute: Vec<&str>,vec_methode: Vec<&str>,erster_wert: u32,zweiter_wert: u32,erster_wert_x: u32,anzahl: i32)->
+(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 			
-			let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
-			let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-		
-			let mut ueberschrift = Scale { x: 15.0 , y: 15.0 };
 			
-			ab=erster_wert;
+			let mut font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+			let mut font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+			
+			let mut anzahl=anzahl;
+			let mut ueberschrift = Scale { x: 13.0 , y: 13.0 };
+			let mut erster_wert=erster_wert;
+			let mut ab = erster_wert;
+			let mut erster_wert_x = erster_wert_x;
+			let mut zweiter_wert=zweiter_wert;
+			let mut eingabe_ueberschift=name;
+			//let mut eingabe_methode=methoden;
+			//let mut eingabe_attribut=attribute;
 			//beschriftung vom bild
+			let mut done=false;
 			let mut done_schrift = false; 
 			let mut zahl = 1;
-			draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font,  eingabe_ueberschift);
+			
+			let mut image=image;	
+			
+			let mut vec_attribute=vec_attribute;
+			let mut vec_methode=vec_methode;
+
+			let mut vec_stelle=0;
+			//muss noch übergeben werden
+			let mut sichtbarkeit_ueberschrift="";//sichtbarkeit_ueberschrift;
+			let mut sichtbarkeit_attribut="";//sichtbarkeit_attribut;
+			let mut sichtbarkeit_methode="";//sichtbarkeit_methode;
+			let mut schreiben=100;
+			
+			if anzahl >=4{
+				schreiben=370
+			}
+			else if anzahl>=7 {
+				schreiben=640;
+			}
+			
+			
+			if sichtbarkeit_ueberschrift == "Paket"{
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, "Paket::");	
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+42, ab+5, ueberschrift, &font, eingabe_ueberschift);
+			}//abstract
+			else if sichtbarkeit_ueberschrift=="Kursiv"{
+				let mut font = Vec::from(include_bytes!("DejaVuSans-Oblique.ttf") as &[u8]);
+				let mut font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, eingabe_ueberschift);
+			}
+			else if sichtbarkeit_ueberschrift=="Abstrakt"{
+				let mut ueberschrift = Scale { x: 11.0 , y: 11.0 };
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, ueberschrift, &font, "<<<Abstract>>>");
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+10, ueberschrift, &font, eingabe_ueberschift);
+			}
+			else if sichtbarkeit_ueberschrift==""{
+				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, eingabe_ueberschift);
+			}
 			let mut attribute = Scale { x: 10.0, y: 10.0 };
 			
-			ab=50;
+			ab=ab+20;
 			//auf 6 attribute  
 			while !done_schrift {
-				if ab<=100{
-					draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab, attribute, &font,  eingabe_methode);
+				if ab<=schreiben{
+					if vec_stelle < vec_attribute.iter().len(){
+						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  sichtbarkeit_attribut); 
+						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab, attribute, &font,  vec_attribute[vec_stelle]); 
+						println!("attribute:{}",vec_attribute[vec_stelle]);
+						if vec_stelle <= vec_attribute.iter().len()-1{
+							vec_stelle=vec_stelle+1;
+						}
+					}
+
 				}
-				else if ab>100{
-					draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab, attribute, &font,  eingabe_attribut);
+				else if ab>schreiben{
+					if vec_stelle < vec_attribute.iter().len(){
+						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  sichtbarkeit_methode); 
+						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab, attribute, &font,  vec_methode[vec_stelle]); 
+						if vec_stelle <= vec_attribute.iter().len()-1{
+							vec_stelle=vec_stelle+1;
+						}
+					}
 				}
 				
-				if ab==100{
-					ab=110;
+				if ab==schreiben{
+					ab=schreiben+10;
+					vec_stelle=0;
 				}
 				ab=ab+10;
 				zahl=zahl+1;
@@ -224,271 +440,815 @@ fn klasse(ueberschrift: &str,pfeil: &str,attribut: &str, methode: &str) {
 					done_schrift = true;
 				}
 			}
-			anzahl=anzahl+1;
-			done=false;
-			//beschränkt auf 4 klassen
-			if anzahl==4{
-				fertig=true;
-			}
-		
 
+			return(image);
+}
+	
+fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,erster_wert: u32,zweiter_wert: u32,erster_wert_x: u32,zweiter_wert_x: u32,anzahl: i32,richtung: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+			
+				println!("in pfeil: {}",anzahl);
+				let mut anzahl=anzahl;
+				let mut image=image;
+				let mut zweiter_wert=zweiter_wert;
+				let mut erster_wert=erster_wert;
+				let mut pfeil_hoehe=erster_wert+70;
+				//eingabe = pfeil art
+				let mut eingabe = pfeilart;
+				let mut pfeil_schr=pfeil_hoehe; 
+				let mut erster_wert=erster_wert;
+				let mut zweiter_wert_x=zweiter_wert_x;
+				let mut erster_wert_x=erster_wert_x;
+				let mut c=pfeil_hoehe;
+				let mut richtung = richtung;
+				
+				/*if anzahl <3{
+					richtung="rechts";
+				}
+				
+				else if anzahl == 3 || anzahl== 7 {
+					richtung ="unten";
+				}
+				else if anzahl>=4 && anzahl<7{
+					richtung="links";
+				}
+				else if anzahl >= 8{
+					richtung="rechts";
+				}*/
 
-				let mut c=100;
 				//Pfeile
 				//assoziation
 				if eingabe == "asso" {
-					//for sagt länge an
-					//beim zeichnen erster wert länge und zweiter höhe
-					for d in zweiter_wert_x..zweiter_wert_x+100{
-					image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+					if richtung == "rechts"{
+						//for sagt länge an
+						//beim zeichnen erster wert länge und zweiter höhe
+						for d in zweiter_wert_x..zweiter_wert_x+100{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
 					}
-				} 	
+					if richtung=="unten"{
+						for d in zweiter_wert..zweiter_wert+120{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+						}
+					}
+					if richtung == "links"{
+						for d in erster_wert_x-100..erster_wert_x{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+					}
+				}
 				
 				//gerichtete assoziation
 				if eingabe == "ge_asso" {
-					//gerade linie
-					for d in zweiter_wert_x..zweiter_wert_x+100{
-					image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
-					}
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}
+					if richtung == "rechts"{
+						//gerade linie
+						for d in zweiter_wert_x..zweiter_wert_x+100{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
 
-					//Strich oben
-					pfeil_schr=pfeil_hoehe;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}	
-					pfeil_schr=100;
-					pfeil_hoehe=100;
-				}
+						//Strich oben
+						pfeil_schr=pfeil_hoehe;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						pfeil_schr=erster_wert+70;
+						pfeil_hoehe=erster_wert+70;
+					}
 				
+					
+					if richtung=="unten"{
+						for d in zweiter_wert..zweiter_wert+120{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+						}
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich links
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+21,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//strich links
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+
+					}
+					
+					if richtung=="links"{
+						for d in erster_wert_x-100..erster_wert_x{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+						erster_wert=zweiter_wert_x+100;
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+				
+				
+					}
+				}
 				//Vererbung
 				if eingabe == "ver" {
-					pfeil_schr=pfeil_hoehe;
+					if richtung == "rechts"{
+						pfeil_schr=pfeil_hoehe;
 
-					//gerade linie
-					for d in zweiter_wert_x..zweiter_wert_x+100{
-					image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						//gerade linie
+						for d in zweiter_wert_x..zweiter_wert_x+100{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						//Strich oben
+						pfeil_schr=pfeil_hoehe;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}		c=c-1;
+			
+						//verbindungsstrich
+						for d in pfeil_schr+2..pfeil_schr+41 {
+							image.get_pixel_mut(erster_wert-20,d).data=[0,0,0];
+						}
+					
 					}
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
+					
+					if richtung=="unten"{
+						for d in zweiter_wert..zweiter_wert+101{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+						}
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich rechts
+						for d in (zweiter_wert_x-95..zweiter_wert_x-75).rev() {
+							image.get_pixel_mut(d+20,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//strich links
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+
+						//verbindungsstrich
+						for d in zweiter_wert_x-93..zweiter_wert_x-56{
 						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
-					//Strich oben
-					pfeil_schr=pfeil_hoehe;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}		c=c-1;
-		
-					//verbindungsstrich
-					for d in pfeil_schr+2..pfeil_schr+41 {
-						image.get_pixel_mut(erster_wert-20,d).data=[0,0,0];
+						}
+						
 					}
+					
+					
+					if richtung=="links"{
+						for d in erster_wert_x-100..erster_wert_x{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+						erster_wert=zweiter_wert_x+100;
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+						//verbindungsstrich
+						for d in pfeil_schr-20..pfeil_schr+20 {
+							image.get_pixel_mut(erster_wert-310,d).data=[0,0,0];
+						}
 				
+					}
+					
 				}
 				
 				//Aggregation
 				if eingabe == "agg" {
-					//gerade linie
-					for d in zweiter_wert_x..zweiter_wert_x+60{
-					image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
-					}
+					if richtung == "rechts"{
+					
+						//gerade linie
+						for d in zweiter_wert_x..zweiter_wert_x+60{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+							
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
 						
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
 						
-					//strich unten links
-					erster_wert=zweiter_wert_x+80;
-					pfeil_schr=pfeil_hoehe+20;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
+						pfeil_schr=pfeil_hoehe;
+						erster_wert=zweiter_wert_x+100;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						
+						pfeil_schr=erster_wert+70;
+						pfeil_hoehe=erster_wert+70;
 					}
-					
-					//strich oben links
-					pfeil_schr=pfeil_hoehe-20;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
-					
-					pfeil_schr=pfeil_hoehe;
-					erster_wert=zweiter_wert_x+100;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}	
-					
-					pfeil_schr=100;
-					pfeil_hoehe=100;
+					if richtung =="unten"{
+						for d in zweiter_wert..zweiter_wert+83{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+						}
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich rechts unten
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+21,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//strich links unten
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						pfeil_schr=pfeil_schr-18;
+						//strich oben links
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+						
+
+						//strich oben rechts
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+21,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}						
+					}
+					if richtung=="links"{
+						//gerade linie
+						for d in erster_wert_x-60..erster_wert_x{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+						pfeil_schr=pfeil_hoehe;
+						erster_wert=zweiter_wert_x+100;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						
+						pfeil_schr=erster_wert+70;
+						pfeil_hoehe=erster_wert+70;						
+
+						
+						
+						
+					}
 				}
-					
 						
 				//Komposition
 				if eingabe == "kompo" {
-					//gerade linie
-					for d in zweiter_wert_x..zweiter_wert_x+100{
-					image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
-					}
-						
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
-						
-					//strich unten links
-					erster_wert=zweiter_wert_x+80;
-					pfeil_schr=pfeil_hoehe+20;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}
-					
-					//strich oben links
-					pfeil_schr=pfeil_hoehe-20;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
-					
-					pfeil_schr=pfeil_hoehe;
-					erster_wert=zweiter_wert_x+100;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}	
-					
+					if richtung == "rechts"{
 
-					//ausmalen
-					let mut gemalt=false;
-					let mut d=120;
-					c=80;
-					let mut anfang=erster_wert-20;
-					let mut ende=erster_wert-19;
+						//gerade linie
+						for d in zweiter_wert_x..zweiter_wert_x+100{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+							
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+						pfeil_schr=pfeil_hoehe;
+						erster_wert=zweiter_wert_x+100;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						
+
+						//ausmalen
+						let mut gemalt=false;
+						let mut d=120;
+						c=80;
+						let mut anfang=erster_wert-20;
+						let mut ende=erster_wert-19;
+						
+						while !gemalt {
+							//oben
+							for x in anfang..ende {
+								image.get_pixel_mut(x,c).data=[0,0,0];
+							}
+							//unten
+							for z in anfang..ende {
+								image.get_pixel_mut(z,d).data=[0,0,0];
+							}
+							c=c+1;
+							d=d-1;
+							anfang=anfang-1;
+							ende=ende+1;
+							if c == 100 {
+								gemalt = true;
+							}
+						}
+						pfeil_schr=100;
+						pfeil_hoehe=100;
+					}
 					
-					while !gemalt {
-						//oben
-						for x in anfang..ende {
-							image.get_pixel_mut(x,c).data=[0,0,0];
+					if richtung =="unten"{
+						for d in zweiter_wert..zweiter_wert+120{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
 						}
-						//unten
-						for z in anfang..ende {
-							image.get_pixel_mut(z,d).data=[0,0,0];
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich rechts unten
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+21,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
 						}
-						c=c+1;
-						d=d-1;
-						anfang=anfang-1;
-						ende=ende+1;
-						if c == 100 {
-							gemalt = true;
+
+						//strich links unten
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						pfeil_schr=pfeil_schr-18;
+						//strich oben links
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+						
+
+						//strich oben rechts
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+21,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+
+						//ausmalen
+						let mut gemalt=false;
+						let mut d=erster_wert+270;
+						let mut c=erster_wert+270-37;
+						let mut anfang=855;
+						let mut ende=856;
+						
+						while !gemalt {
+							//oben
+							for x in anfang..ende {
+								image.get_pixel_mut(x,c).data=[0,0,0];
+							}
+							//unten
+							for z in anfang..ende {
+								image.get_pixel_mut(z,d).data=[0,0,0];
+							}
+							c=c+1;
+							d=d-1;
+							anfang=anfang-1;
+							ende=ende+1;
+							if c == erster_wert+270-17 {
+								gemalt = true;
+							}
 						}
 					}
-					pfeil_schr=100;
-					pfeil_hoehe=100;
+					if richtung == "links"{
+						//gerade linie
+						for d in erster_wert_x-100..erster_wert_x{
+						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+						}
+
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+						pfeil_schr=pfeil_hoehe;
+						erster_wert=zweiter_wert_x+100;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+						
+						pfeil_schr=erster_wert+70;
+						pfeil_hoehe=erster_wert+70;	
+					}
+					
+					
+					
+						//ausmalen
+						let mut gemalt=false;
+						let mut d=390;
+						let mut c=350;
+						let mut anfang=erster_wert-330;
+						let mut ende=erster_wert-330;
+						
+						while !gemalt {
+							//oben
+							for x in anfang..ende {
+								image.get_pixel_mut(x,c).data=[0,0,0];
+							}
+							//unten
+							for z in anfang..ende {
+								image.get_pixel_mut(z,d).data=[0,0,0];
+							}
+							c=c+1;
+							d=d-1;
+							anfang=anfang-1;
+							ende=ende+1;
+							if c == 370 {
+								gemalt = true;
+							}
+						}
+						//pfeil_schr=erster_wert+70;
+						//pfeil_hoehe=erster_wert+70;
+
+					
 				}
 				//Implementierung
 				if eingabe == "imple" {
-					let mut s=0;
-					let mut w=0;
-						//gerade linie
+					if richtung == "rechts"{
 
-						for d in zweiter_wert_x..zweiter_wert_x+80{
-							if s<=5 {
-							image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
-							}
-							else if s>5{
-								image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
-								w=w+1;
-								if w==10 {
-									s=0;
-									w=0;
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
+
+							for d in zweiter_wert_x..zweiter_wert_x+80{
+								if s<=5 {
+								image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
 								}
-							}
-							s=s+1;
+								else if s>5{
+									image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}	
+
+					
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						//Strich oben
+						pfeil_schr=pfeil_hoehe;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}		c=c-1;
+			
+						//verbindungsstrich
+						for d in pfeil_schr+2..pfeil_schr+41 {
+							image.get_pixel_mut(erster_wert-20,d).data=[0,0,0];
+						}
+						pfeil_schr=100;
+						pfeil_hoehe=100;
+					}
+					
+					if richtung=="unten"{
+						/*for d in zweiter_wert..zweiter_wert+101{
+						image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+						}*/
+
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
+
+							for d in zweiter_wert..zweiter_wert+101{
+								if s<=5 {
+								image.get_pixel_mut(zweiter_wert_x-75,d).data=[255,255,255];
+								}
+								else if s>5{
+									image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}	
+						
+						
+						
+						
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich rechts
+						for d in (zweiter_wert_x-95..zweiter_wert_x-75).rev() {
+							image.get_pixel_mut(d+20,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//strich links
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
 						}	
 
-				
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
+						//verbindungsstrich
+						for d in zweiter_wert_x-93..zweiter_wert_x-56{
 						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
-					}	
-					//Strich oben
-					pfeil_schr=pfeil_hoehe;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}		c=c-1;
-		
-					//verbindungsstrich
-					for d in pfeil_schr+2..pfeil_schr+41 {
-						image.get_pixel_mut(erster_wert-20,d).data=[0,0,0];
+						}
+						
 					}
-					pfeil_schr=100;
-					pfeil_hoehe=100;
+					
+					if richtung =="links"{
+					
+					
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
+
+							for d in zweiter_wert_x-220..zweiter_wert_x-150{
+								if s<=5 {
+								image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+								}
+								else if s>5{
+									image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}						
+					
+					
+						erster_wert=zweiter_wert_x+100;
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+						//verbindungsstrich
+						for d in pfeil_schr-20..pfeil_schr+20 {
+							image.get_pixel_mut(erster_wert-310,d).data=[0,0,0];
+						}
+					
+					
+					}
+					
 				}
 					
 				//abhängigkeit
 
 				if eingabe == "abh" {
-					let mut s=0;
-					let mut w=0;
-						//gerade linie
+					if richtung == "rechts"{
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
 
-						for d in zweiter_wert_x..zweiter_wert_x+80{
-							if s<=5 {
-							image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
-							}
-							else if s>5{
-								image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
-								w=w+1;
-								if w==10 {
-									s=0;
-									w=0;
+							for d in zweiter_wert_x..zweiter_wert_x+80{
+								if s<=5 {
+								image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
 								}
-							}
-							s=s+1;
+								else if s>5{
+									image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}	
+					
+						erster_wert=zweiter_wert_x+100;
+					//strich unten
+					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//Strich oben
+						pfeil_schr=pfeil_hoehe;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
 						}	
-				
-					erster_wert=zweiter_wert_x+100;
-				//strich unten
-				//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr+1;
+						pfeil_schr=100;
+						pfeil_hoehe=100;
+					}
+					
+					
+					if richtung =="unten"{
+
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
+
+							for d in zweiter_wert..zweiter_wert+120{
+								if s<=5 {
+								image.get_pixel_mut(zweiter_wert_x-75,d).data=[255,255,255];
+								}
+								else if s>5{
+									image.get_pixel_mut(zweiter_wert_x-75,d).data=[0,0,0];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}	
+						pfeil_schr=erster_wert+270-19;
+						pfeil_hoehe=erster_wert+270;
+						//strich rechts
+						for d in (zweiter_wert_x-95..zweiter_wert_x-75).rev() {
+							image.get_pixel_mut(d+20,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}
+
+						//strich links
+						pfeil_schr=pfeil_hoehe;
+						for d in (zweiter_wert_x-95..zweiter_wert_x-76).rev() {
+							image.get_pixel_mut(d+2,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}	
+
+
+						
+					}
+						
+
+					if richtung =="links"{
+					
+					
+						let mut s=0;
+						let mut w=0;
+							//gerade linie
+
+							for d in zweiter_wert_x-240..zweiter_wert_x-150{
+								if s<=5 {
+								image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
+								}
+								else if s>5{
+									image.get_pixel_mut(d,pfeil_hoehe).data=[255,255,255];
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;
+							}						
+					
+					
+						erster_wert=zweiter_wert_x+100;
+							
+						//strich unten links
+						erster_wert=zweiter_wert_x+80;
+						pfeil_schr=pfeil_hoehe+20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr-1;
+						}
+						
+						//strich oben links
+						pfeil_schr=pfeil_hoehe-20;
+						for d in (erster_wert-20..erster_wert+1).rev() {
+							image.get_pixel_mut(d-310,pfeil_schr).data=[0,0,0];
+							pfeil_schr=pfeil_schr+1;
+						}	
+						
+
+					
+					
 					}
 
-					//Strich oben
-					pfeil_schr=pfeil_hoehe;
-					for d in (erster_wert-20..erster_wert+1).rev() {
-						image.get_pixel_mut(d,pfeil_schr).data=[0,0,0];
-						pfeil_schr=pfeil_schr-1;
-					}	
-					pfeil_schr=100;
-					pfeil_hoehe=100;
+						
 				}
-			eingabe="";
-		}
-		let _ = image.save(path).unwrap();
-	}
+	richtung="";
+	eingabe="";
+	return(image);
+}
+
+
 
