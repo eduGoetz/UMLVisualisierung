@@ -10,12 +10,16 @@ use std::f32;
 use std::i32;
 
 use imageproc::pixelops::weighted_sum;
+use imageproc::drawing::*;
+use imageproc::rect::Rect;
+use imageproc::rect::Region;
 use rusttype::{Font, Scale, point, PositionedGlyph};
 
 use std::path::Path;
 use std::env;
 use std::fs::File;
 use std::io::*;
+use std::collections::HashMap;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 
@@ -179,16 +183,14 @@ fn main() {
 				
 	
 	//es müssen der klassenname,Pfeilart,das bild,der pfad zum bild,die zahl bei welcher klasse er ist,vektor für attribute,vektor für methoden
-	
-	let mut tuple=klasse("klassenname","imple",image,path,3,vec_attributea,vec_methodea,"unten");
-	//tuple=klasse("klassenname","abh",tuple.0,path,tuple.1,vec_attributeb,vec_methodeb);
-	tuple=klasse("klassenname","ver",tuple.0,path,7,vec_attributec,vec_methodec,"rechts");
+	 let mut tuple=klasse("eins","",image,path,1,vec_attributea,vec_methodea,"",0);
+	tuple=klasse("zwei","asso",tuple.0,path,2,vec_attributeb,vec_methodeb,"",tuple.2);
+	//tuple=klasse("drei","ge_asso",tuple.0,path,4,vec_attributec,vec_methodec,"",tuple.2);
 
-	
 }
 	
-pub fn klasse(ueberschrift: &str,pfeil: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: Vec<&str>,vec_methode: Vec<&str>,richtung: &str)
-->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,i32) {
+pub fn klasse(ueberschrift: &str,pfeil: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: Vec<&str>,vec_methode: Vec<&str>,richtung: &str,anzahl_alt: i32)
+->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,i32,i32){//,HashMap<u32, i32>) {
 	
 		let mut eingabe_ueberschift=ueberschrift;
 		let mut eingabe_pfeil=pfeil;
@@ -202,6 +204,7 @@ pub fn klasse(ueberschrift: &str,pfeil: &str,image: image::ImageBuffer<Rgb<u8>, 
 		let mut erster_wert_x=30;
 		let mut zweiter_wert_x=180;
 		let mut ab = erster_wert;
+		let mut anzahl_alt=anzahl_alt;
 		
 		let mut fertig=false;
 		let mut done = false; 
@@ -213,100 +216,52 @@ pub fn klasse(ueberschrift: &str,pfeil: &str,image: image::ImageBuffer<Rgb<u8>, 
 		
 		let mut vec_attribute=vec_attribute;
 		let mut vec_methode=vec_methode;
-
-		let mut tuple= zeichne_klasse(anzahl,"",image);
 		
+		let mut tuple= zeichne_klasse(anzahl,"",image,erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x);
+		//let mut alte_werte=(tuple.1,tuple.2,tuple.3,tuple.4,anzahl);
 		image=zeichne_schrift(tuple.0,eingabe_ueberschift,vec_attribute,vec_methode,tuple.1,tuple.2,tuple.3,anzahl);
-		image=zeichne_pfeil(image,eingabe,tuple.1,tuple.2,tuple.3,tuple.4,anzahl,pfeil_richtung);
+		image=zeichne_pfeil(image,eingabe,tuple.1,tuple.2,tuple.3,tuple.4,anzahl,pfeil_richtung,anzahl_alt);
+		let mut anzahl_alt=koordinaten(anzahl);
 		let  _ = image.save(file).unwrap();
 		anzahl=anzahl+1;
-		return(image,anzahl);
 
-
+		return(image,anzahl,anzahl_alt.4);
+	/*for (key, value) in &tuple.5 {
+    println!("ausgabe der hashmap key:{} value: {}", key, value);
+	}*/
+	//println!("{}",tuple.5);
+		//return(image,anzahl,tuple.1,tuple.2,tuple.3,tuple.4);//,tuple.5);
 }
 
-fn zeichne_klasse(anzahl: i32,eingabe: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,u32,u32,u32,u32){
-		let mut erster_wert=30;
-		let mut zweiter_wert=180;
-		let mut erster_wert_x=30;
-		let mut zweiter_wert_x=180;
-		let mut mitte_unterseite_x=zweiter_wert_x-erster_wert_x;
-		let mut mitte_unterseite_y;
+fn zeichne_klasse(nummer: i32,eingabe: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,eins:u32,zwei:u32,drei:u32,vier:u32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >,u32,u32,u32,u32){
+		let mut erster_wert=eins;
+		let mut zweiter_wert=zwei;
+		let mut erster_wert_x=drei;
+		let mut zweiter_wert_x=vier;
+		//let mut mitte_unterseite_x=zweiter_wert_x-erster_wert_x;
+		//let mut mitte_unterseite_y;
 		let mut done = false; 
 		let mut ab = erster_wert;
 		let mut zeile=1;
 		let mut fertig=false;
 		let mut eingabe=eingabe;
-		let mut anzahl=anzahl;
+		let mut anzahl=0;
+		anzahl=nummer;
 		let mut image=image;	
 		
+
 		
 		while !fertig { 	
-			if anzahl == 1{
-				erster_wert=30;
-				zweiter_wert=180;
-				erster_wert_x=280;
-				zweiter_wert_x=430;
-				
-				//eingabe="";
-			}
-			if anzahl == 2{
-				erster_wert=30;
-				zweiter_wert=180;
-				erster_wert_x=530;
-				zweiter_wert_x=680;
-				//eingabe="";
-			}
-			if anzahl == 3{
-				erster_wert=30;
-				zweiter_wert=180;
-				erster_wert_x=780;
-				zweiter_wert_x=930;
-				//eingabe="";	
-			}
-			if anzahl == 4{
-				erster_wert=300;
-				zweiter_wert=450;
-				erster_wert_x=780;
-				zweiter_wert_x=930;
-				//eingabe="";
-			}
-			if anzahl == 5{
-				erster_wert=300;
-				zweiter_wert=450;
-				erster_wert_x=530;
-				zweiter_wert_x=680;
-				//eingabe="";
-			}
 
-			if anzahl == 6{
-				erster_wert=300;
-				zweiter_wert=450;
-				erster_wert_x=280;
-				zweiter_wert_x=430;
-				//eingabe="";
-			}
-			if anzahl == 7{
-				erster_wert=300;
-				zweiter_wert=450;
-				erster_wert_x=30;
-				zweiter_wert_x=180;
-				//eingabe="";
-			}
-			if anzahl == 8{
-				erster_wert=570;
-				zweiter_wert=620;
-				erster_wert_x=30;
-				zweiter_wert_x=180;
-				//eingabe="";
-			}
-			if anzahl == 9{
-				erster_wert=570;
-				zweiter_wert=620;
-				erster_wert_x=280;
-				zweiter_wert_x=430;
-				//eingabe="";
-			}
+			let mut tuple=koordinaten(anzahl);
+			erster_wert=tuple.0;
+			zweiter_wert=tuple.1;
+			erster_wert_x=tuple.2;
+			zweiter_wert_x=tuple.3;
+
+			
+			
+			
 			//tabelle zeichnen
 			//senkrechte striche
 			for d in erster_wert..zweiter_wert {
@@ -330,14 +285,14 @@ fn zeichne_klasse(anzahl: i32,eingabe: &str,image: image::ImageBuffer<Rgb<u8>, V
 				}
 				zeile=zeile+1;
 				if ab > zweiter_wert {
-					mitte_unterseite_y=ab;
-					println!("{}",mitte_unterseite_y);
+				//	mitte_unterseite_y=ab;
 					zeile=1;
 					done = true;
 					fertig=true;
 				}
 			}
 	}
+
 
 	return (image,erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x);
 	
@@ -348,11 +303,11 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_a
 (image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 			
 			
-			let mut font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
-			let mut font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+			let  font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+			let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 			
 			let mut anzahl=anzahl;
-			let mut ueberschrift = Scale { x: 13.0 , y: 13.0 };
+			let  ueberschrift = Scale { x: 13.0 , y: 13.0 };
 			let mut erster_wert=erster_wert;
 			let mut ab = erster_wert;
 			let mut erster_wert_x = erster_wert_x;
@@ -376,12 +331,15 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_a
 			let mut sichtbarkeit_attribut="";//sichtbarkeit_attribut;
 			let mut sichtbarkeit_methode="";//sichtbarkeit_methode;
 			let mut schreiben=100;
-			
-			if anzahl >=4{
+			 
+			if anzahl >= 4{
 				schreiben=370
 			}
-			else if anzahl>=7 {
+			if anzahl >= 8 {
 				schreiben=640;
+			}
+			if anzahl >= 8 {
+				schreiben=910;
 			}
 			
 			
@@ -390,8 +348,8 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_a
 				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+42, ab+5, ueberschrift, &font, eingabe_ueberschift);
 			}//abstract
 			else if sichtbarkeit_ueberschrift=="Kursiv"{
-				let mut font = Vec::from(include_bytes!("DejaVuSans-Oblique.ttf") as &[u8]);
-				let mut font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+				let  font = Vec::from(include_bytes!("DejaVuSans-Oblique.ttf") as &[u8]);
+				let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 				draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, eingabe_ueberschift);
 			}
 			else if sichtbarkeit_ueberschrift=="Abstrakt"{
@@ -411,7 +369,7 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_a
 					if vec_stelle < vec_attribute.iter().len(){
 						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  sichtbarkeit_attribut); 
 						draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab, attribute, &font,  vec_attribute[vec_stelle]); 
-						println!("attribute:{}",vec_attribute[vec_stelle]);
+						//println!("attribute:{}",vec_attribute[vec_stelle]);
 						if vec_stelle <= vec_attribute.iter().len()-1{
 							vec_stelle=vec_stelle+1;
 						}
@@ -438,29 +396,48 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,vec_a
 					ab=erster_wert;
 					zahl=1;
 					done_schrift = true;
+					schreiben=100;
 				}
 			}
 
 			return(image);
 }
 	
-fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,erster_wert: u32,zweiter_wert: u32,erster_wert_x: u32,zweiter_wert_x: u32,anzahl: i32,richtung: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,erster_wert: u32,zweiter_wert: u32,erster_wert_x: u32,zweiter_wert_x: u32,anzahl: i32,richtung: &str,anzahl_alt: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 			
-				println!("in pfeil: {}",anzahl);
+				let draw_color = Rgb([0u8, 0u8, 0u8]);
 				let mut anzahl=anzahl;
 				let mut image=image;
+				
 				let mut zweiter_wert=zweiter_wert;
 				let mut erster_wert=erster_wert;
+				let mut zweiter_wert_x=zweiter_wert_x;
+				let mut erster_wert_x=erster_wert_x;
+				
 				let mut pfeil_hoehe=erster_wert+70;
 				//eingabe = pfeil art
 				let mut eingabe = pfeilart;
 				let mut pfeil_schr=pfeil_hoehe; 
-				let mut erster_wert=erster_wert;
-				let mut zweiter_wert_x=zweiter_wert_x;
-				let mut erster_wert_x=erster_wert_x;
+
 				let mut c=pfeil_hoehe;
 				let mut richtung = richtung;
 				
+				let mut mitte_oberseite=0;
+				if anzahl_alt==0{
+					richtung="";
+				 erster_wert=500;
+					}
+					
+
+				let mut anzahl_alt=anzahl_alt;
+				
+				let mut tuple=koordinaten(anzahl_alt);
+				
+				
+				mitte_oberseite=erster_wert_x+50;
+
+				let mut mitte_unterseite=tuple.2+75;
+				 
 				/*if anzahl <3{
 					richtung="rechts";
 				}
@@ -474,16 +451,20 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 				else if anzahl >= 8{
 					richtung="rechts";
 				}*/
-
 				//Pfeile
 				//assoziation
 				if eingabe == "asso" {
+					if anzahl_alt>0{
+						draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);	
+					}						
 					if richtung == "rechts"{
 						//for sagt länge an
 						//beim zeichnen erster wert länge und zweiter höhe
 						for d in zweiter_wert_x..zweiter_wert_x+100{
 						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
 						}
+						//draw_line_segment_mut(&mut image,(350.0,300.0),(30.0,180.0), draw_color);
+						
 					}
 					if richtung=="unten"{
 						for d in zweiter_wert..zweiter_wert+120{
@@ -499,12 +480,20 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 				
 				//gerichtete assoziation
 				if eingabe == "ge_asso" {
+					if anzahl_alt>0{
+					//für rechts
+						draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+						//schräge rechts
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-20) as f32,(tuple.1+20) as f32), draw_color);
+						//Schräge links
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-50) as f32,(tuple.1+10) as f32), draw_color);		
+					}	
 					if richtung == "rechts"{
 						//gerade linie
-						for d in zweiter_wert_x..zweiter_wert_x+100{
+						/*for d in zweiter_wert_x..zweiter_wert_x+100{
 						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
 						}
-						erster_wert=zweiter_wert_x+100;
+						erster_wert=zweiter_wert_x+100;*/
 					//strich unten
 					//bei for erster wert wo er anfängt in x und zweiter wo er aufhört
 						for d in (erster_wert-20..erster_wert+1).rev() {
@@ -520,8 +509,7 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 						}	
 						pfeil_schr=erster_wert+70;
 						pfeil_hoehe=erster_wert+70;
-					}
-				
+					}			
 					
 					if richtung=="unten"{
 						for d in zweiter_wert..zweiter_wert+120{
@@ -571,11 +559,25 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 				}
 				//Vererbung
 				if eingabe == "ver" {
+				//rechts
+					if anzahl_alt>0{				
+						draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+						//schräge rechts
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-20) as f32,(tuple.1+20) as f32), draw_color);
+						//Schräge links
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-50) as f32,(tuple.1+10) as f32), draw_color);	
+						//verbindungsstrich
+						draw_line_segment_mut(&mut image,((mitte_unterseite-20) as f32,(tuple.1+20) as f32),((mitte_unterseite-50) as f32,(tuple.1+10) as f32), draw_color);		
+						
+					}					
+				
+				
+				
 					if richtung == "rechts"{
 						pfeil_schr=pfeil_hoehe;
 
 						//gerade linie
-						for d in zweiter_wert_x..zweiter_wert_x+100{
+						for d in zweiter_wert_x..zweiter_wert_x+80{
 						image.get_pixel_mut(d,pfeil_hoehe).data=[0,0,0];
 						}
 						erster_wert=zweiter_wert_x+100;
@@ -658,6 +660,21 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 				
 				//Aggregation
 				if eingabe == "agg" {
+				
+					if anzahl_alt>0{
+					//für rechts
+						draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+						//schräge rechts oben
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite+10) as f32,(tuple.1+10) as f32), draw_color);
+						//Schräge links oben
+						draw_line_segment_mut(&mut image,((mitte_unterseite+10) as f32,(tuple.1+10) as f32),((mitte_unterseite-5) as f32,(tuple.1+20) as f32), draw_color);	
+						draw_line_segment_mut(&mut image,((mitte_unterseite-5) as f32,(tuple.1+20) as f32),((mitte_unterseite-15) as f32,(tuple.1+7) as f32), draw_color);	
+						
+					}					
+				
+				
+				
+				
 					if richtung == "rechts"{
 					
 						//gerade linie
@@ -777,6 +794,21 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 						
 				//Komposition
 				if eingabe == "kompo" {
+				
+					if anzahl_alt>0{
+					//für rechts
+						draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+						//schräge rechts oben
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite+10) as f32,(tuple.1+10) as f32), draw_color);
+						//Schräge links oben
+						draw_line_segment_mut(&mut image,((mitte_unterseite+10) as f32,(tuple.1+10) as f32),((mitte_unterseite-5) as f32,(tuple.1+20) as f32), draw_color);	
+						draw_line_segment_mut(&mut image,((mitte_unterseite-5) as f32,(tuple.1+20) as f32),((mitte_unterseite-15) as f32,(tuple.1+7) as f32), draw_color);
+						
+						
+						let rect = Rect::at(mitte_unterseite as i32, tuple.1 as i32).of_size(20, 10);
+						draw_filled_rect_mut(&mut image,rect,draw_color);
+					}						
+				
 					if richtung == "rechts"{
 
 						//gerade linie
@@ -938,12 +970,12 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 						
 						pfeil_schr=erster_wert+70;
 						pfeil_hoehe=erster_wert+70;	
-					}
+					
 					
 					
 					
 						//ausmalen
-						let mut gemalt=false;
+						/*let mut gemalt=false;
 						let mut d=390;
 						let mut c=350;
 						let mut anfang=erster_wert-330;
@@ -965,14 +997,40 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 							if c == 370 {
 								gemalt = true;
 							}
-						}
+						}*/
 						//pfeil_schr=erster_wert+70;
 						//pfeil_hoehe=erster_wert+70;
+					}
 
 					
 				}
 				//Implementierung
 				if eingabe == "imple" {
+					if anzahl_alt>0{
+					//für rechts
+						let mut s=0;
+						let mut w=0;
+						for d in mitte_oberseite..mitte_unterseite {
+							if s<=5 {
+								draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+								}
+								else if s>5{
+									//draw_line_segment_mut(&mut image,(mitte_oberseite as f32, (zweiter_wert-150) as f32),(mitte_unterseite as f32,tuple.1 as f32), draw_color);
+									w=w+1;
+									if w==10 {
+										s=0;
+										w=0;
+									}
+								}
+								s=s+1;								
+						}	
+						//schräge rechts
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-20) as f32,(tuple.1+20) as f32), draw_color);
+						//Schräge links
+						draw_line_segment_mut(&mut image,(mitte_unterseite as f32, tuple.1 as f32),((mitte_unterseite-50) as f32,(tuple.1+10) as f32), draw_color);		
+					}					
+				
+				
 					if richtung == "rechts"{
 
 						let mut s=0;
@@ -1250,5 +1308,145 @@ fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,pfeilart: &str,ers
 	return(image);
 }
 
+fn koordinaten(anzahl:i32)->(u32,u32,u32,u32,i32) {
 
+				let mut erster_wert=30;
+				let mut zweiter_wert=180;
+				let mut erster_wert_x=30;
+				let mut zweiter_wert_x=180;
+
+			if anzahl == 1{
+				erster_wert=30;
+				zweiter_wert=180;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+
+				//eingabe="";
+			}		
+		
+			if anzahl == 2{
+				erster_wert=30;
+				zweiter_wert=180;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+				
+				//eingabe="";
+			}
+			if anzahl == 3{
+				erster_wert=30;
+				zweiter_wert=180;
+				erster_wert_x=530;
+				zweiter_wert_x=680;
+			
+				//eingabe="";
+			}
+			if anzahl == 4{
+				erster_wert=30;
+				zweiter_wert=180;
+				erster_wert_x=780;
+				zweiter_wert_x=930;
+		
+				//eingabe="";	
+			}
+			if anzahl == 5{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=780;
+				zweiter_wert_x=930;
+				
+				//eingabe="";
+			}
+			if anzahl == 6{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=530;
+				zweiter_wert_x=680;
+				
+				//eingabe="";
+			}
+
+			if anzahl == 7{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+			
+				//eingabe="";
+			}
+			if anzahl == 8{
+				erster_wert=300;
+				zweiter_wert=450;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+			
+				//eingabe="";
+			}
+			if anzahl == 9{
+				erster_wert=570;
+				zweiter_wert=720;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+				
+				//eingabe="";
+			}
+			if anzahl == 10{
+				erster_wert=570;
+				zweiter_wert=720;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+			
+				//eingabe="";
+			}
+			if anzahl == 11{
+				erster_wert=570;
+				zweiter_wert=720;
+				erster_wert_x=530;
+				zweiter_wert_x=680;
+			
+				//eingabe="";
+			}			
+			if anzahl == 12{
+				erster_wert=570;
+				zweiter_wert=720;
+				erster_wert_x=780;
+				zweiter_wert_x=930;
+			
+				//eingabe="";
+			}			
+			if anzahl == 13{
+				erster_wert=840;
+				zweiter_wert=990;
+				erster_wert_x=780;
+				zweiter_wert_x=930;
+			
+				//eingabe="";
+			}			
+			if anzahl == 14{
+				erster_wert=840;
+				zweiter_wert=990;
+				erster_wert_x=530;
+				zweiter_wert_x=680;
+			
+				//eingabe="";
+			}			
+			if anzahl == 15{
+				erster_wert=840;
+				zweiter_wert=990;
+				erster_wert_x=280;
+				zweiter_wert_x=430;
+			
+				//eingabe="";
+			}			
+			if anzahl == 16{
+				erster_wert=840;
+				zweiter_wert=990;
+				erster_wert_x=30;
+				zweiter_wert_x=180;
+			
+				//eingabe="";
+			}						
+//println!("Koordinatien:: anzahl:{}, erste:{}, zweite:{}, erste x:{}, zweite x:{}",anzahl,erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x);
+			return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl);
+
+}
 
