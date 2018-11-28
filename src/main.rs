@@ -1,3 +1,6 @@
+#![feature(self_struct_ctor)]
+#![feature(type_ascription)]
+
 extern crate regex;
 extern crate gtk;
 extern crate image;
