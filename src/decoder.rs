@@ -1,13 +1,15 @@
 extern crate regex;
 use regex::Regex;
+use std::fmt;
+use gui::*;
 
 #[derive(Debug)]
 pub struct Class {
-    class_id: i32,
-    class_type: ClassType,
-    name: String,
-    attributes: Vec<Attribute>,
-    methods: Vec<Method>,
+    pub class_id: i32,
+    pub class_type: ClassType,
+    pub name: String,
+    pub attributes: Vec<Attribute>,
+    pub methods: Vec<Method>,
 }
 
 impl Class {
@@ -16,13 +18,30 @@ impl Class {
     }
 }
 
+impl fmt::Display for Class {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut params_str = "".to_string();
+        for i in &self.attributes{
+            params_str = [params_str, i.to_string()].join("\n");
+        }
+
+        let mut methods_str = "".to_string();
+        for j in &self.methods{
+            methods_str = [methods_str, j.to_string()].join("\n");
+        }
+        write!(f, "{}, {} \n {}", self.class_type.to_string(), params_str, methods_str);
+        Ok(())
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Attribute {
-    access_modifier: AccessModifier,
-    is_static: bool,
-    is_final: bool,
-    data_type: String,
-    name: String,
+    pub access_modifier: AccessModifier,
+    pub is_static: bool,
+    pub is_final: bool,
+    pub data_type: String,
+    pub name: String,
 }
 
 impl Attribute {
@@ -31,10 +50,35 @@ impl Attribute {
     }
 }
 
+impl fmt::Display for Attribute {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut access_mod_str = "".to_string();
+        if let AccessModifier::Public = self.access_modifier {
+            access_mod_str = "+".to_string();
+        } else if let AccessModifier::Private = self.access_modifier {
+            access_mod_str = "-".to_string();
+        } else if let AccessModifier::Protected = self.access_modifier {
+            access_mod_str = "#".to_string();
+        } else if let AccessModifier::Package = self.access_modifier {
+            access_mod_str = "~".to_string();
+        } else {
+            access_mod_str = "".to_string();
+        }
+
+        if(self.is_final == true){
+            write!(f, "{}{} : {}{}", access_mod_str, self.name.to_uppercase(), self.data_type, "{readOnly}");
+        } else {
+            write!(f, "{}{} : {}", access_mod_str, self.name, self.data_type);
+        }
+        Ok(())
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Parameter {
-    data_type: String,
-    name: String,
+    pub data_type: String,
+    pub name: String,
 }
 
 impl Parameter {
@@ -43,14 +87,22 @@ impl Parameter {
     }
 }
 
+impl fmt::Display for Parameter {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}:{}", self.name, self.data_type);
+        Ok(())
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Method {
-    access_modifier: AccessModifier,
-    is_static: bool,
-    is_final: bool,
-    return_type: String,
-    name: String,
-    parameters: Vec<Parameter>,
+    pub access_modifier: AccessModifier,
+    pub is_static: bool,
+    pub is_final: bool,
+    pub return_type: String,
+    pub name: String,
+    pub parameters: Vec<Parameter>,
 }
 
 impl Method{
@@ -59,13 +111,46 @@ impl Method{
     }
 }
 
+impl fmt::Display for Method {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut access_mod_str = "".to_string();
+        if let AccessModifier::Public = self.access_modifier {
+            access_mod_str = "+".to_string();
+        } else if let AccessModifier::Private = self.access_modifier {
+            access_mod_str = "-".to_string();
+        } else if let AccessModifier::Protected = self.access_modifier {
+            access_mod_str = "#".to_string();
+        } else if let AccessModifier::Package = self.access_modifier {
+            access_mod_str = "~".to_string();
+        } else {
+            access_mod_str = "".to_string();
+        }
+
+        let mut params_str = "".to_string();
+        if(!(&self.parameters).is_empty()) {
+            for i in &self.parameters {
+                params_str = [params_str, i.to_string()].join(", ");
+            }
+            params_str = params_str.trim_left_matches(", ").to_string();
+        }
+
+        if(self.is_final == true){
+            write!(f, "{}{}({}):{}{}", access_mod_str, self.name.to_uppercase(), params_str, self.return_type, "{readOnly}");
+        } else {
+            write!(f, "{}{}({}):{}", access_mod_str, self.name, params_str, self.return_type,);
+        }
+        Ok(())
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Relation {
-    relation_type: RelationType,
-    from: i32,
-    to: i32,
-    from_multiplicity: String,
-    to_multiplicity: String,
+    pub relation_type: RelationType,
+    pub from: i32,
+    pub to: i32,
+    pub from_multiplicity: String,
+    pub to_multiplicity: String,
 }
 
 impl Relation{
@@ -74,54 +159,81 @@ impl Relation{
     }
 }
 #[derive(Debug)]
-enum ClassType{
+pub enum ClassType{
     Class,
     Interface,
+    Abstract,
+}
+
+impl fmt::Display for ClassType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            ClassType::Class => write!(f, "Class"),
+            ClassType::Interface => write!(f, "Interface"),
+            ClassType::Abstract => write!(f, "Abstract"),
+        }
+    }
 }
 #[derive(Debug)]
-enum AccessModifier{
+pub enum AccessModifier{
     Public,
     Private,
     Protected,
+    Package,
+    Default,
 }
 #[derive(Debug)]
-enum RelationType{
+pub enum RelationType{
     Vererbung,
     Aggregation,
     Komposition,
     Assoziation,
     GerAssoziation,
     Implementierung,
+    Ableitung,
 }
 
 
-fn decode_classes(classes_str: String) -> Vec<Class>{
-    let classes_regex = Regex::new(r"(\d+;((Class)|(Interface));(\w+);(.*);(.*)(/?))+").unwrap();
+fn decode_classes(classes_str: String) -> (Vec<Class>, String){
+    let classes_regex = Regex::new(r"(\d+;((Class)|(Interface)|(Abstract));(\w+);(.*);(.*)(/?))+").unwrap();
 
+    let mut errors = "".to_string();
     let mut class_list_return = Vec::new();
     let classes_strings = classes_str.split("/");
     for cla_str in classes_strings {
-        if classes_regex.is_match(cla_str.as_ref()){
+        if classes_regex.is_match(cla_str.as_ref()) {
             let class_components_vec: Vec<String> = cla_str.split(&";".to_string()).map(|x| x.to_owned()).collect();
 
             let mut class_type: ClassType;
-            match class_components_vec[1].as_ref(){
+            match class_components_vec[1].as_ref() {
                 "Class" => class_type = ClassType::Class,
-                "Interface" => class_type =  ClassType::Interface,
-                _ => continue,
+                "Interface" => class_type = ClassType::Interface,
+                "Abstract" => class_type = ClassType::Abstract,
+                _ => {
+                    errors = [errors, "Der Klassentyp ist falsch, mind. 1 Klasse übersprungen.\n".to_string()].join("");
+                    continue
+                },
             }
 
+            errors = [errors, decode_attributes(class_components_vec[3].to_string()).1].join("");
+            errors = [errors, decode_methods(class_components_vec[4].to_string()).1].join("");
+
             class_list_return.push(Class::new(class_components_vec[0].parse::<i32>().unwrap(), class_type,
-                                              class_components_vec[2].to_string(), decode_attributes(class_components_vec[3].to_string()),
-                                              decode_methods(class_components_vec[4].to_string())));
+                                              class_components_vec[2].to_string(), decode_attributes(class_components_vec[3].to_string()).0,
+                                              decode_methods(class_components_vec[4].to_string()).0));
+        } else {
+            if (cla_str != "") {
+                errors = [errors, "Das Klassenlayout ist falsch, mind. 1 Klasse übersprungen.\n".to_string()].join("");
+            }
         }
     }
-    return class_list_return;
+    return (class_list_return, errors);
 }
 
 
-fn decode_attributes(attributes_str: String) -> Vec<Attribute>{
-    let attribute_regex = Regex::new(r"((public|private|protected):(static)?:(final)?:(\w+):(\w+)(,?))*").unwrap();
+fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String){
+    let attribute_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+)(,?))*").unwrap();
+    let mut errors = "".to_string();
     let mut class_attributes_return = Vec::new();
 
     let attributes_strings = attributes_str.split(",");
@@ -134,20 +246,33 @@ fn decode_attributes(attributes_str: String) -> Vec<Attribute>{
                 "public" => attribute_access_modifier = AccessModifier::Public,
                 "private" => attribute_access_modifier =  AccessModifier::Private,
                 "protected" => attribute_access_modifier = AccessModifier::Protected,
-                _ => continue,
+                "package" => attribute_access_modifier = AccessModifier::Package,
+                "" => attribute_access_modifier = AccessModifier::Default,
+                _ => {
+                    errors = [errors, "Der Zugriffsmodifikator in einem Attribut ist falsch, mind, ein Attribut übersprungen.\n".to_string()].join("");
+                    continue
+                },
             }
 
-            class_attributes_return.push(Attribute::new(attribute_access_modifier,attribute_components[1].to_string() != "",
-                                                        attribute_components[2].to_string() != "", attribute_components[3].to_string(),
-                                                        attribute_components[4].to_string()))
+            if (!(attribute_components.is_empty()) && attribute_components.len()==5) {
+                class_attributes_return.push(Attribute::new(attribute_access_modifier, attribute_components[1].to_string() != "",
+                                                            attribute_components[2].to_string() != "", attribute_components[3].to_string(),
+                                                            attribute_components[4].to_string()))
+            } else {
+                errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
+            }
+        } else {
+            errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
         }
     }
-    return class_attributes_return;
+    return (class_attributes_return, errors);
 }
 
 //private:static::void:getNumber:int=number String=wort
-fn decode_methods(methods_str: String) -> Vec<Method>{
-    let method_regex = Regex::new(r"((public|private|protected):(static)?:(final)?:(\w+):(\w+):(.*)?)").unwrap();
+fn decode_methods(methods_str: String) -> (Vec<Method>, String){
+    let method_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+):(.*)?)").unwrap();
+    let mut errors = "".to_string();
+
     let mut class_methods_return = Vec::new();
 
     let method_strings = methods_str.split(",");
@@ -160,20 +285,34 @@ fn decode_methods(methods_str: String) -> Vec<Method>{
                 "public" => method_access_modifier = AccessModifier::Public,
                 "private" => method_access_modifier =  AccessModifier::Private,
                 "protected" => method_access_modifier = AccessModifier::Protected,
-                _ => continue,
+                "package" => method_access_modifier = AccessModifier::Package,
+                "" => method_access_modifier = AccessModifier::Default,
+                _ => {
+                    errors = [errors, "Der Zugriffsmodifikator in einer Methode ist falsch, mind, eine Methode übersprungen.\n".to_string()].join("");
+                    continue
+                },
             }
 
-            class_methods_return.push(Method::new(method_access_modifier, method_components[1].to_string() != "",
-                                                  method_components[2].to_string() != "", method_components[3].to_string(),
-                                                  method_components[4].to_string(), decode_parameters(method_components[5].to_string())));
+            errors = [errors, decode_parameters(method_components[5].to_string()).1.to_string()].join("");
+
+            if (!(method_components.is_empty()) && method_components.len()>=5) {
+                class_methods_return.push(Method::new(method_access_modifier, method_components[1].to_string() != "",
+                                                      method_components[2].to_string() != "", method_components[3].to_string(),
+                                                      method_components[4].to_string(), decode_parameters(method_components[5].to_string()).0));
+            } else{
+                errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
+            }
+        } else {
+            errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
         }
     }
-    return class_methods_return;
+    return (class_methods_return, errors);
 }
 
 
-fn decode_parameters(param_str: String) -> Vec<Parameter>{
+fn decode_parameters(param_str: String) -> (Vec<Parameter>, String){
     let param_regex = Regex::new(r"((w+)=(w+)( )?)*").unwrap();
+    let mut errors = "".to_string();
     let mut class_methods_param_return = Vec::new();
 
     let param_strings = param_str.split(" ");
@@ -181,15 +320,21 @@ fn decode_parameters(param_str: String) -> Vec<Parameter>{
         if param_regex.is_match(par_str.as_ref()){
             let single_params: Vec<String> = par_str.split(&"=".to_string()).map(|x| x.to_owned()).collect();
 
-            class_methods_param_return.push(Parameter::new(single_params[0].to_string(), single_params[1].to_string()));
+            if (!(single_params.is_empty()) && single_params.len()==2) {
+                class_methods_param_return.push(Parameter::new(single_params[0].to_string(), single_params[1].to_string()));
+            } else {
+                errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");
+            }
+        } else {
+            errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");
         }
     }
-    return class_methods_param_return;
+    return (class_methods_param_return, errors);
 }
 
 
 fn decode_relations(relations_str: String) -> Vec<Relation>{
-    let relation_regex = Regex::new(r"((V|A|gA|AG|K|I);\d+->\d+;((\d+|\w+|\*):(\d+|\w+|\*))?(,)?)*").unwrap();
+    let relation_regex = Regex::new(r"((V|A|gA|AG|K|I|AB);\d+->\d+;((\d+|\w+|\*):(\d+|\w+|\*))?(,)?)*").unwrap();
     let mut relations_return = Vec::new();
 
     let relation_strings = relations_str.split(",");
@@ -205,6 +350,7 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
                 "AG" => relation_type = RelationType::Aggregation,
                 "K" => relation_type = RelationType::Komposition,
                 "I" => relation_type = RelationType::Implementierung,
+                "AB" => relation_type = RelationType::Ableitung,
                 _ => continue,
             }
 
@@ -230,16 +376,20 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
     return relations_return;
 }
 
-pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>){
+
+pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>, String){
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
     let input = given_input.to_string();
     let mut class_list = Vec::new();
+    let mut errors = "".to_string();
     let mut relation_list = Vec::new();
 
     if input_regex.is_match(input.as_ref()){
+        //gui.set_new_noti("fdfdfdf".to_string());
         let class_relation_vec: Vec<String> = input.split(&"|".to_string()).map(|x| x.to_owned()).collect();
-        class_list = decode_classes(class_relation_vec[0].to_string());
+        class_list = decode_classes(class_relation_vec[0].to_string()).0;
+        errors = decode_classes(class_relation_vec[0].to_string()).1;
 
         if class_relation_vec.len() > 1 {
             relation_list = decode_relations(class_relation_vec[1].to_string());
@@ -247,13 +397,15 @@ pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>){
     }
 
     for j in &class_list {
+        //println!("{}", j);
         println!("{:?}", j);
-    }
 
+    }
+    //klasse(Klassenname(String),Klassentyp(String),image,path,klassenid(int),vec_attribute,vec_methoden);
     for i in &relation_list {
         println!("{:?}", i);
     }
 
-    return (class_list, relation_list);
+    return (class_list, relation_list, errors);
 }
 
