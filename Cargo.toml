@@ -5,3 +5,12 @@ authors = ["egoetz <eduard.goetz@fh-bielefeld.de>"]
 
 [dependencies]
 regex = "0.2"
+image = "*"
+imageproc = "0.16.0"
+rusttype = "0.7"
+conv = "0.3.1"
+io = "0.0.2"
+
+[dependencies.gtk]
+features = ["v3_22"]
+version = "0.2.0"
