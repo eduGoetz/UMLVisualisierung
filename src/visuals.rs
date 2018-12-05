@@ -11,6 +11,7 @@ use imageproc::definitions::{Clamp, Image};
 use conv::ValueInto;
 use std::f32;
 use std::i32;
+use std;
 
 use imageproc::pixelops::weighted_sum;
 use imageproc::drawing::*;
@@ -451,7 +452,7 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,klass
                         }
                     //draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab-5, attribute, &font,  sichtbarkeit_methode);
                     //draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+10, ab-5, attribute, &font,  vec_methode[vec_stelle]);
-                    if vec_stelle <= vec_attribute.iter().len()-1{
+                    if vec_stelle <= vec_attribute.iter().len(){
                         vec_stelle=vec_stelle+1;
                     }
                 }
@@ -1653,3 +1654,4 @@ fn koordinaten(anzahl:i32)->(u32,u32,u32,u32,i32,u32) {
     return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl,mitte_unterseite);
 
 }
+
