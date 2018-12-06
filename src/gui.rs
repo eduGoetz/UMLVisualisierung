@@ -250,6 +250,6 @@ fn call_class_draw(class_list: Vec<decoder::Class>, relation_list: Vec<decoder::
             pfeiltyp = "abh";
         }
 
-        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to);
+        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
     }
 }

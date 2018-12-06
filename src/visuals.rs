@@ -31,6 +31,71 @@ use rusttype::{FontCollection};
 use image::GenericImageView;
 /// Draws colored text on an image in place. `scale` is augmented font scaling on both the x and y axis (in pixels). Note that this function *does not* support newlines, you must do this manually
 
+pub fn use_case_hard(){
+    let mut image=erstelle_image();
+    let file = Path::new("res/UML_visual_result.png");
+    let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
+    let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+    let  schrift = Scale { x: 10.0 , y: 10.0 };
+
+
+    let draw_color = Rgb([0u8, 0u8, 0u8]);
+    let rect = Rect::at(200,10).of_size(790, 990);
+    //let center = (80 as i32, 50 as i32);
+
+    draw_hollow_rect_mut(&mut image, rect, draw_color);
+
+
+    let mut x_anfang =80;
+    let mut head_anfang=50;
+    let mut body_anfang=60;
+    let mut arm_anfang=70;
+    let mut bein_anfang=90;
+    let mut bein_ende=110;
+    let mut ist_anzahl_guys=1;
+    let mut soll_anzahl_guys=8;
+    let mut fertig = false;
+
+    //personen erstellen
+    while !fertig {
+        //head
+        draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color) ;
+        //body
+        draw_line_segment_mut(&mut image,(x_anfang as f32,  body_anfang as f32),( x_anfang as f32, bein_anfang as f32), draw_color);
+        //arm rechts
+        draw_line_segment_mut(&mut image,(x_anfang as f32,  arm_anfang as f32),( (90 as f32),( body_anfang as f32)), draw_color);
+        //arm links
+        draw_line_segment_mut(&mut image,(x_anfang as f32,  arm_anfang as f32),( (70 as f32),( body_anfang as f32)), draw_color);
+        //bein rechts
+        draw_line_segment_mut(&mut image,(x_anfang as f32,  bein_anfang as f32),( (90 as f32),( bein_ende as f32)), draw_color);
+        //bein links
+        draw_line_segment_mut(&mut image,(x_anfang as f32,  bein_anfang as f32),( (70 as f32),( bein_ende as f32)), draw_color);
+        //name
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 70, bein_ende+10, schrift, &font, "dute");
+
+
+        head_anfang=head_anfang+130;
+        body_anfang=body_anfang+130;
+        arm_anfang=arm_anfang+130;
+        bein_anfang=bein_anfang+130;
+        bein_ende=bein_ende+130;
+        ist_anzahl_guys=ist_anzahl_guys+1;
+
+
+        if  ist_anzahl_guys==soll_anzahl_guys{
+            fertig = true;
+        }
+    }
+
+    draw_hollow_ellipse_mut(&mut image, (400 as i32,400 as i32), 50 as i32, 25 as i32, draw_color);
+
+    draw_line_segment_mut(&mut image,(x_anfang as f32,  205 as f32),( 350 as f32, 205 as f32), draw_color);
+    draw_hollow_ellipse_mut(&mut image, (400 as i32,205 as i32), 50 as i32, 25 as i32, draw_color);
+
+
+    let  _ = image.save(file).unwrap();
+}
+
 pub fn draw_text_mut<'a, I>(
     image: &'a mut I,
     color: I::Pixel,
@@ -475,7 +540,7 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,klass
     return(image);
 }
 
-pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,pfeilart: &str,von: i32,nach: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,pfeilart: &str,von: i32,nach: i32, multi_von: &str,multi_nach:&str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 
     let draw_color = Rgb([0u8, 0u8, 0u8]);
     let mut image=image;
@@ -483,7 +548,8 @@ pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::pa
     let mut nach=nach;
     let mut file=file;
 
-
+    let mut multi_von=multi_von;
+    let mut multi_nach=multi_nach;
     let mut anzahl_alt=5;
 
     if von == 0 {anzahl_alt=0;}
@@ -1506,6 +1572,14 @@ pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::pa
     eingabe="";
     //let arg = "res/UML_visual_result.png";
     //let path = Path::new(&arg);
+
+    let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
+    let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+    let mut multi = Scale { x: 10.0, y: 10.0 };
+
+
+    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), mitte_oberseite+5, (zweiter_wert-160), multi, &font, multi_von);
+    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), mitte_unterseite+5, (tuple.1), multi, &font, multi_nach);
 
     let  _ = image.save(file).unwrap();
 
