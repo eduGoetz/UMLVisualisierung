@@ -1,10 +1,10 @@
 # UML-Visualisierung - Eine Software zur Visualisierung von textuell spezifizierten UML-Diagrammen
 
-##Getting started
+## Getting started
 * Nach Start des Programmes kann man direkt loslegen und Eingaben tätigen
 
-##Syntax
-###Klasse
+## Syntax
+### Klasse
 * Eine Klasse besteht hier aus mehreren Komponenten:
   1. ID
   Jede Klasse hat hier eine ID, die benutzt wird um Klassen zu identifizieren und einander zuordnen zu können. Wie viele Dinge hier führt eine falsche Eingabe hier zum Überspringen der Klasse.
