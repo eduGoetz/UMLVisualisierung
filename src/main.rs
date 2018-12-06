@@ -4,6 +4,7 @@ extern crate image;
 extern crate imageproc;
 extern crate rusttype;
 extern crate conv;
+extern crate webbrowser;
 use regex::Regex;
 use gtk::*;
 

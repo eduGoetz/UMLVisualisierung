@@ -408,9 +408,3 @@ pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>, String){
 
     return (class_list, relation_list, errors);
 }
-
-//gui fertig
-//tests
-//templates
-//imageproc
-//Fehlermeldung bei falscheingabe
