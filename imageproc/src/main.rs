@@ -101,8 +101,10 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 
 
 fn main() {
-let mut diagramm="USE";
-if diagramm=="USE" {
+
+erstelle_use_case();
+
+}
 pub fn erstelle_use_case(){
 	let mut image=erstelle_image();
 	let file = Path::new("res/Use-Case.png");
@@ -268,9 +270,9 @@ fn zeichne_beziehung_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_v
 	return(image);
 }
 }								
-}								
+								
 
-if diagramm=="Klasse" {						
+					
 			pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: Vec<&str>,vec_methode: Vec<&str>)
 			->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 				
@@ -891,5 +893,5 @@ if diagramm=="Klasse" {
 						return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl,mitte_unterseite);
 
 			}
-	}
-}
+	
+
