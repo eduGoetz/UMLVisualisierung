@@ -1,7 +1,9 @@
 extern crate regex;
 use regex::Regex;
 use std::fmt;
-use gui::*;
+use std::path::Path;
+
+use visuals;
 
 #[derive(Debug)]
 pub struct Class {
@@ -394,7 +396,7 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
 }
 
 
-pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>, String){
+pub fn decode_input(given_input: String) -> String{
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
     let input = given_input.to_string();
@@ -403,7 +405,6 @@ pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>, String){
     let mut relation_list = Vec::new();
 
     if input_regex.is_match(input.as_ref()){
-        //gui.set_new_noti("fdfdfdf".to_string());
         let class_relation_vec: Vec<String> = input.split(&"|".to_string()).map(|x| x.to_owned()).collect();
         class_list = decode_classes(class_relation_vec[0].to_string()).0;
         errors = decode_classes(class_relation_vec[0].to_string()).1;
@@ -414,14 +415,53 @@ pub fn decode_input(given_input: String) -> (Vec<Class>, Vec<Relation>, String){
     }
 
     for j in &class_list {
-        //println!("{}", j);
         println!("{:?}", j);
 
     }
-    //klasse(Klassenname(String),Klassentyp(String),image,path,klassenid(int),vec_attribute,vec_methoden);
     for i in &relation_list {
         println!("{:?}", i);
     }
 
-    return (class_list, relation_list, errors);
+    call_class_draw(class_list, relation_list);
+    return errors;
+}
+
+fn call_class_draw(class_list: Vec<Class>, relation_list: Vec<Relation>){
+    let path = Path::new("res/UML_visual_result.png");
+    let mut image = visuals::erstelle_image();
+    for i in &class_list {
+
+        let mut klassentyp = "";
+        if let ClassType::Class = i.class_type {
+            klassentyp = "Class";
+        } else if let ClassType::Abstract = i.class_type {
+            klassentyp = "Abstract";
+        } else {
+            klassentyp = "Interface";
+        }
+
+        image = visuals::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
+
+    }
+
+    for j in &relation_list {
+        let mut pfeiltyp = "";
+        if let RelationType::Vererbung = j.relation_type {
+            pfeiltyp = "ver";
+        } else if let RelationType::Aggregation = j.relation_type {
+            pfeiltyp = "agg";
+        } else if let RelationType::Komposition = j.relation_type {
+            pfeiltyp = "kompo";
+        } else if let RelationType::Assoziation = j.relation_type {
+            pfeiltyp = "asso";
+        } else if let RelationType::GerAssoziation = j.relation_type {
+            pfeiltyp = "ge_asso";
+        } else if let RelationType::Implementierung = j.relation_type {
+            pfeiltyp = "imple";
+        } else {
+            pfeiltyp = "abh";
+        }
+
+        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
+    }
 }
