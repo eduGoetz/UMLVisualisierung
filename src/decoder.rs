@@ -239,6 +239,7 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String){
     let attributes_strings = attributes_str.split(",");
     for attr_str in attributes_strings {
         if attribute_regex.is_match(attr_str.as_ref()){
+
             let attribute_components: Vec<String> = attr_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
             let mut attribute_access_modifier: AccessModifier;
@@ -259,7 +260,11 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String){
                                                             attribute_components[2].to_string() != "", attribute_components[3].to_string(),
                                                             attribute_components[4].to_string()))
             } else {
-                errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
+                if attribute_components.is_empty() {
+                    errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
+                } else {
+                    errors = [errors, "WARNUNG: Attributfelder wurden leer gelassen.\n".to_string()].join("");
+                }
             }
         } else {
             errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
@@ -270,13 +275,17 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String){
 
 //private:static::void:getNumber:int=number String=wort
 fn decode_methods(methods_str: String) -> (Vec<Method>, String){
-    let method_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+):(.*)?)").unwrap();
+    let method_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+):(.*)?(,?))*").unwrap();
     let mut errors = "".to_string();
 
     let mut class_methods_return = Vec::new();
 
     let method_strings = methods_str.split(",");
     for met_str in method_strings {
+        if met_str == "" {
+            errors = [errors, "WARNUNG: Methodenfelder wurden leer gelassen.\n".to_string()].join("");
+            continue;
+        }
         if method_regex.is_match(met_str.as_ref()){
             let method_components: Vec<String> = met_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
@@ -300,7 +309,11 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String){
                                                       method_components[2].to_string() != "", method_components[3].to_string(),
                                                       method_components[4].to_string(), decode_parameters(method_components[5].to_string()).0));
             } else{
-                errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
+                if method_components.is_empty() {
+                    errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
+                } else {
+                    errors = [errors, "WARNUNG: Methodenfelder wurden leer gelassen.\n".to_string()].join("");
+                }
             }
         } else {
             errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
@@ -323,7 +336,11 @@ fn decode_parameters(param_str: String) -> (Vec<Parameter>, String){
             if (!(single_params.is_empty()) && single_params.len()==2) {
                 class_methods_param_return.push(Parameter::new(single_params[0].to_string(), single_params[1].to_string()));
             } else {
-                errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");
+                if single_params.is_empty() {
+                    errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");
+                } else {
+                    errors = [errors, "WARNUNG: Parameterfelder wurden leer gelassen.\n".to_string()].join("");
+                }
             }
         } else {
             errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");

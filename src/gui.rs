@@ -7,6 +7,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::path::Path;
+use std::fs::File;
+use std::io::prelude::*;
 
 use decoder;
 use visuals;
@@ -41,6 +43,26 @@ impl UmlGUI {
         let window = Window::new(WindowType::Toplevel);
         let header = Header::new();
         let content = Content::new();
+
+        let input_clone = content.input.clone();
+        header.open_file.connect_clicked(move |_| {
+            let dialog = FileChooserDialog::new(Some("Datei öffnen"), Some(&Window::new(WindowType::Popup)), FileChooserAction::Open);
+
+            dialog.add_button("Abbrechen", ResponseType::Cancel.into());
+            dialog.add_button("Öffnen", ResponseType::Accept.into());
+
+            let button_select = dialog.run();
+            if button_select == ResponseType::Accept.into(){
+                let file_path = dialog.get_filename().unwrap();
+                let mut file = File::open(file_path).unwrap();
+                let mut file_content = String::new();
+                file.read_to_string(&mut file_content);
+                input_clone.set_text(&file_content);
+                dialog.close();
+            } else if button_select == ResponseType::Cancel.into(){
+                dialog.close();
+            }
+        });
 
         window.set_titlebar(&header.container);
         window.set_title("UML Visualisierung");
@@ -168,17 +190,26 @@ pub fn gui_main() {
 
     let mut gui = UmlGUI::new();
     {
-        let window_clone = gui.window.clone();
+        /*let window_clone = gui.window.clone();
         gui.header.open_file.connect_clicked(move |_| {
 
-            let dialog = FileChooserDialog::with_buttons(Some("Datei öffnen"), Some(&window_clone), FileChooserAction::Open,
-                                                         &[("Abbrechen", ResponseType::Cancel), ("Öffnen", ResponseType::Accept)]);
+            let dialog = FileChooserDialog::new(Some("Datei öffnen"), Some(&window_clone), FileChooserAction::Open);
 
-            //dialog.add_button("Abbrechen", ResponseType::Cancel.into());
-            //dialog.add_button("Öffnen", ResponseType::Accept.into());
+            dialog.add_button("Abbrechen", ResponseType::Cancel.into());
+            dialog.add_button("Öffnen", ResponseType::Accept.into());
 
-            dialog.run();
-        });
+            let button_select = dialog.run();
+            if button_select == ResponseType::Accept.into(){
+                let file_path = dialog.get_filename().unwrap();
+                let mut file = File::open(file_path).unwrap();
+                let mut file_content = String::new();
+                file.read_to_string(&mut file_content);
+                //gui.content.input.set_text("fdfd");
+            } else if button_select == ResponseType::Cancel.into(){
+                dialog.close();
+            }
+
+        });*/
         /*let input = gui.content.input.clone();
         let mut left_pane = gui.content.left_pane.clone();
         //let (class_list, relation_list) = decoder::decode_input(input.get_text().unwrap());
@@ -217,16 +248,6 @@ fn call_class_draw(class_list: Vec<decoder::Class>, relation_list: Vec<decoder::
         } else {
             klassentyp = "Interface";
         }
-
-        //let mut attr_vec= Vec::new();
-        //for attr in i.attributes{
-
-        //}
-
-        let mut meth_vec= Vec::new();
-        //for meth in i.methods{
-            meth_vec.push("fdfd");
-        //}
 
         image = visuals::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
 
