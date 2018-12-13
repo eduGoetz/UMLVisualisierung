@@ -2,9 +2,6 @@ extern crate image;
 extern crate imageproc;
 extern crate rusttype;
 extern crate conv;
-//mod decoder;
-
-//use decoder;
 
 use image::{GenericImage, ImageBuffer, Pixel};
 use imageproc::definitions::{Clamp, Image};
@@ -28,7 +25,6 @@ use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 
 use image::GenericImageView;
-/// Draws colored text on an image in place. `scale` is augmented font scaling on both the x and y axis (in pixels). Note that this function *does not* support newlines, you must do this manually
 
 pub fn draw_text_mut<'a, I>(
     image: &'a mut I,
@@ -69,7 +65,6 @@ pub fn draw_text_mut<'a, I>(
     }
 }
 
-/// Draws colored text on an image in place. `scale` is augmented font scaling on both the x and y axis (in pixels). Note that this function *does not* support newlines, you must do this manually
 pub fn draw_text<'a, I>(
     image: &'a mut I,
     color: I::Pixel,
@@ -91,7 +86,7 @@ where
 }
 
 pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
-	let mut image = ImageBuffer::<Rgb<u8>, Vec<u8> >::new(1000, 1000);//image = RgbImage::new(200, 200);
+	let mut image = ImageBuffer::<Rgb<u8>, Vec<u8> >::new(1000, 1000);
 	
 	//bild weiß machen
 	for a in 0..1000 {
@@ -108,7 +103,7 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 fn main() {
 let mut diagramm="USE";
 if diagramm=="USE" {
-
+pub fn erstelle_use_case(){
 	let mut image=erstelle_image();
 	let file = Path::new("res/Use-Case.png");
 
@@ -135,8 +130,8 @@ if diagramm=="USE" {
 	
 	let  _ = image.save(file).unwrap();
 
-pub fn zeichne_systemgrenze(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,name: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
-	let  font = Vec::from(include_bytes!("DejaVuSans-Bold.ttf") as &[u8]);
+fn zeichne_systemgrenze(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,name: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+	let  font = Vec::from(include_bytes!("../res/font/DejaVuSans-Bold.ttf") as &[u8]);
 	let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 	let  schrift = Scale { x: 20.0 , y: 20.0 };
 	let draw_color = Rgb([0u8, 0u8, 0u8]);
@@ -150,10 +145,10 @@ pub fn zeichne_systemgrenze(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,name: &s
 	return(image);
 
 }	
-pub fn zeichne_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,ist_anzahl_guys: i32,soll_anzahl_guys: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+fn zeichne_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,ist_anzahl_guys: i32,soll_anzahl_guys: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 	let draw_color = Rgb([0u8, 0u8, 0u8]);
 	let mut image=image;
-	let  font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+	let  font = Vec::from(include_bytes!("../res/font/DejaVuSans.ttf") as &[u8]);
 	let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 	let  schrift = Scale { x: 10.0 , y: 10.0 };
 	
@@ -204,8 +199,8 @@ pub fn zeichne_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,ist_anzahl_guy
 	
 	return(image)	
 }
-pub fn beschrifte_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person: i32,name: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
-	let  font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+fn beschrifte_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person: i32,name: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+	let  font = Vec::from(include_bytes!("../res/font/DejaVuSans.ttf") as &[u8]);
 	let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 	let  schrift = Scale { x: 10.0 , y: 10.0 };
 	let mut image=image;
@@ -220,7 +215,7 @@ pub fn beschrifte_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person: i32
 
 	return(image)	
 }
-pub fn zeichne_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,y_ellipse: i32,x_ellipse: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+fn zeichne_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,y_ellipse: i32,x_ellipse: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 	let draw_color = Rgb([0u8, 0u8, 0u8]);
 	let mut image=image;
 	
@@ -230,10 +225,10 @@ pub fn zeichne_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,y_ellipse: i32,x
 	draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32,y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
 	return(image)
 }
-pub fn zeichne_case_mit_assoziation(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,x_anfang: i32,y_ellipse: i32,x_ellipse: i32,person: i32,von: &str,nach: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+fn zeichne_case_mit_assoziation(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,x_anfang: i32,y_ellipse: i32,x_ellipse: i32,person: i32,von: &str,nach: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 	let draw_color = Rgb([0u8, 0u8, 0u8]);
 	let mut image=image;
-	let  font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+	let  font = Vec::from(include_bytes!("../res/font/DejaVuSans.ttf") as &[u8]);
 	let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 	let  schrift = Scale { x: 10.0 , y: 10.0 };
 	
@@ -251,7 +246,7 @@ pub fn zeichne_case_mit_assoziation(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,
 	return(image)
 
 }				
-pub fn zeichne_beziehung_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_von: i32,person_nach: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
+fn zeichne_beziehung_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_von: i32,person_nach: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 	let draw_color = Rgb([0u8, 0u8, 0u8]);
 	let mut image=image;
 	let mut person_von=person_von-1;
@@ -271,10 +266,11 @@ pub fn zeichne_beziehung_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,pers
 	//verbindungsstrich
 	draw_line_segment_mut(&mut image,((kopf_oben_x-10) as f32,(kopf_oben_y-30) as f32),((kopf_oben_x+10) as f32,(kopf_oben_y-30) as f32), draw_color);
 	return(image);
+}
 }								
 }								
 
-if diagramm=="UML" {						
+if diagramm=="Klasse" {						
 			pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: Vec<&str>,vec_methode: Vec<&str>)
 			->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 				
