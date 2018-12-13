@@ -1,14 +1,19 @@
 extern crate gtk;
 use gtk::*;
+use gtk::prelude::*;
 use std::process;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::path::Path;
+use std::fs::File;
+use std::io::prelude::*;
 
 use decoder;
 use visuals;
+
+use webbrowser;
 
 pub struct UmlGUI {
     pub window: Window,
@@ -17,12 +22,14 @@ pub struct UmlGUI {
 }
 
 pub struct Header {
-    pub container: HeaderBar
+    pub container: HeaderBar,
+    pub open_file: Button,
+    pub open_doc: Button,
 }
 
 pub struct Content {
     pub container: Paned,
-    pub left_pane: Rc<RefCell<Image>>,
+    pub left_pane: ScrolledWindow,
     pub input: TextBuffer,
     pub class_template_button: Button,
     pub relation_template_button: Button,
@@ -36,6 +43,26 @@ impl UmlGUI {
         let window = Window::new(WindowType::Toplevel);
         let header = Header::new();
         let content = Content::new();
+
+        let input_clone = content.input.clone();
+        header.open_file.connect_clicked(move |_| {
+            let dialog = FileChooserDialog::new(Some("Datei öffnen"), Some(&Window::new(WindowType::Popup)), FileChooserAction::Open);
+
+            dialog.add_button("Abbrechen", ResponseType::Cancel.into());
+            dialog.add_button("Öffnen", ResponseType::Accept.into());
+
+            let button_select = dialog.run();
+            if button_select == ResponseType::Accept.into(){
+                let file_path = dialog.get_filename().unwrap();
+                let mut file = File::open(file_path).unwrap();
+                let mut file_content = String::new();
+                file.read_to_string(&mut file_content);
+                input_clone.set_text(&file_content);
+                dialog.close();
+            } else if button_select == ResponseType::Cancel.into(){
+                dialog.close();
+            }
+        });
 
         window.set_titlebar(&header.container);
         window.set_title("UML Visualisierung");
@@ -64,10 +91,19 @@ impl Header {
     fn new() -> Header {
         let container = HeaderBar::new();
 
+        let open_file = Button::new_with_label("Datei");
+
+        let open_doc = Button::new_with_label("Dokumentation");
+        open_doc.connect_clicked(move |_  |{
+            webbrowser::open("https://github.com/eduGoetz/UMLVisualisierung/blob/master/README.md");
+        });
+
         container.set_title("UML Visualisierung");
         container.set_show_close_button(true);
+        container.add(&open_file);
+        container.add(&open_doc);
 
-        return Header { container }
+        return Header { container, open_file, open_doc }
     }
 }
 
@@ -77,16 +113,14 @@ impl Content {
         let container = Paned::new(Orientation::Horizontal);
         let right_pane = Box::new(Orientation::Vertical, 3);
 
-        let left_pane: Rc<RefCell<Image>> = Rc::new(RefCell::new(Image::new()));
+        let left_pane_image: Rc<RefCell<Image>> = Rc::new(RefCell::new(Image::new()));
 
         let input = TextBuffer::new(None);
         let input_view = TextView::new_with_buffer(&input);
-        //input.set_placeholder_text("Eingabe");
 
         let class_template_button = Button::new_with_label("Neues Klasse-Template");
         let input_clone = input.clone();
         class_template_button.connect_clicked(move |_| {
-            //let template = "ID;Class oder Interface;Name;Zugriffsmodifikator:static:final:int:number:,;Zugriffsmodifikator:static:final:void:name:Parametertyp=Parametername Parametertyp2=Parametername2/".to_owned();
             let template = "ID;Typ;Name;Sichtbarkeit:static:final:Datentyp:name,;Sichtbarkeit:static:final:Rückgabetyp:Name:Paramtyp=Paramname Paramtyp=Paramname2/".to_owned();
             input_clone.set_text([get_current_input(&input_clone), template].join("").as_ref());
         });
@@ -104,10 +138,10 @@ impl Content {
         let noti_label = Label::new("i - Relationen kommen zuletzt und werden mit einem '|' von den Klassen getrennt.");
 
         let input_clone = input.clone();
-        let left_pane_clone = left_pane.clone();
+        let left_pane_clone = left_pane_image.clone();
         let label_clone = noti_label.clone();
         start_button.connect_clicked(move |start_button| {
-            let (class_list, relation_list, errors) = decoder::decode_input(get_current_input(&input_clone));
+            let (class_list, relation_list, errors) = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
             label_clone.set_text(errors.as_ref());
             call_class_draw(class_list, relation_list);
 
@@ -122,6 +156,9 @@ impl Content {
         let input_scrolled = ScrolledWindow::new(None, None);
         input_scrolled.add(&input_view);
 
+        let left_pane = ScrolledWindow::new(None, None);
+        left_pane.add(&*left_pane_image.borrow_mut());
+
         right_pane.set_border_width(5);
         right_pane.pack_start(&class_template_button, false, false, 0);
         right_pane.pack_start(&relation_template_button, false, false, 0);
@@ -130,7 +167,7 @@ impl Content {
         right_pane.pack_start(&start_button, false, true, 0);
 
         //container.add(&*left_pane_clone.borrow_mut());
-        container.pack1(&*left_pane.borrow_mut(), true, true);
+        container.pack1(&left_pane, true, true);
         container.pack2(&right_pane, true, true);
 
         //let left_pane = left_pane.into_inner();
@@ -153,6 +190,26 @@ pub fn gui_main() {
 
     let mut gui = UmlGUI::new();
     {
+        /*let window_clone = gui.window.clone();
+        gui.header.open_file.connect_clicked(move |_| {
+
+            let dialog = FileChooserDialog::new(Some("Datei öffnen"), Some(&window_clone), FileChooserAction::Open);
+
+            dialog.add_button("Abbrechen", ResponseType::Cancel.into());
+            dialog.add_button("Öffnen", ResponseType::Accept.into());
+
+            let button_select = dialog.run();
+            if button_select == ResponseType::Accept.into(){
+                let file_path = dialog.get_filename().unwrap();
+                let mut file = File::open(file_path).unwrap();
+                let mut file_content = String::new();
+                file.read_to_string(&mut file_content);
+                //gui.content.input.set_text("fdfd");
+            } else if button_select == ResponseType::Cancel.into(){
+                dialog.close();
+            }
+
+        });*/
         /*let input = gui.content.input.clone();
         let mut left_pane = gui.content.left_pane.clone();
         //let (class_list, relation_list) = decoder::decode_input(input.get_text().unwrap());
@@ -192,16 +249,6 @@ fn call_class_draw(class_list: Vec<decoder::Class>, relation_list: Vec<decoder::
             klassentyp = "Interface";
         }
 
-        //let mut attr_vec= Vec::new();
-        //for attr in i.attributes{
-
-        //}
-
-        let mut meth_vec= Vec::new();
-        //for meth in i.methods{
-            meth_vec.push("fdfd");
-        //}
-
         image = visuals::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
 
     }
@@ -224,6 +271,6 @@ fn call_class_draw(class_list: Vec<decoder::Class>, relation_list: Vec<decoder::
             pfeiltyp = "abh";
         }
 
-        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to);
+        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
     }
 }
