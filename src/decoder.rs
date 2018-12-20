@@ -5,6 +5,17 @@ use std::path::Path;
 
 use visuals;
 
+pub struct ClassDiagram{
+    pub classes: Vec<Class>,
+    pub relations: Vec<Relation>,
+}
+
+impl ClassDiagram {
+    fn new(classes: Vec<Class>, relations: Vec<Relation>) -> ClassDiagram {
+        ClassDiagram {classes: classes, relations: relations}
+    }
+}
+
 #[derive(Debug)]
 pub struct Class {
     pub class_id: i32,
@@ -160,6 +171,67 @@ impl Relation{
         Relation { relation_type: relation_type, from: from, to: to, from_multiplicity: from_multiplicity, to_multiplicity: to_multiplicity}
     }
 }
+
+
+pub struct UseCaseDiagramm {
+    pub name: String,
+    pub actors: Vec<Actor>,
+    pub use_cases: Vec<UseCase>,
+    pub use_case_realtions: Vec<UseCaseRelation>,
+}
+
+impl UseCaseDiagramm {
+    fn new(name: String, actors: Vec<Actor>, use_cases: Vec<UseCase>, use_case_realations: Vec<UseCaseRelation>) -> UseCaseDiagramm{
+        UseCaseDiagramm { name: name, actors: actors, use_cases: use_cases, use_case_realtions: use_case_realations}
+    }
+}
+
+
+pub struct Actor {
+    pub id: i32,
+    pub name: String,
+    pub extends_from: i32,
+    pub has_use_case: Vec<i32>,
+}
+
+impl Actor{
+    fn new(id: i32, name: String, extends_from: i32, has_use_case: Vec<i32>) -> Actor{
+        Actor {id: id, name: name, extends_from: extends_from, has_use_case: has_use_case}
+    }
+}
+
+
+pub struct UseCase {
+    pub id: i32,
+    pub name: String,
+    pub is_extension_point: bool,
+}
+
+impl UseCase{
+    fn new(id: i32, name: String, is_extension_point: bool) -> UseCase {
+        UseCase {id: id, name: name, is_extension_point: is_extension_point}
+    }
+}
+
+
+pub struct UseCaseRelation {
+    pub relation_type: UseCaseRelationType,
+    pub from: i32,
+    pub to: i32,
+}
+
+impl UseCaseRelation{
+    fn new(relation_type: UseCaseRelationType, from: i32, to: i32) -> UseCaseRelation {
+        UseCaseRelation {relation_type: relation, from: from, to: to}
+    }
+}
+
+
+pub enum UseCaseRelationType{
+    Extends,
+    Include,
+}
+
 #[derive(Debug)]
 pub enum ClassType{
     Class,
@@ -396,7 +468,7 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
 }
 
 
-pub fn decode_input(given_input: String) -> String{
+pub fn decode_class_diagram(given_input: String) -> (String, Vec<ClassDiagram>){
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
     let input = given_input.to_string();
@@ -423,7 +495,57 @@ pub fn decode_input(given_input: String) -> String{
     }
 
     call_class_draw(class_list, relation_list);
-    return errors;
+    return (errors, ClassDiagramm::new(class_list, relation_list));
+}
+
+fn decode_actors(actors_str: String) -> Vec<Actor>{
+
+}
+
+fn decode_use_cases(use_cases_str: String) -> Vec<UseCase>{
+    let use_case_regex = Regex::new(r"((\d+:\w+:(EP)?)(,)?)*").unwrap();
+
+
+}
+
+fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRelation>{
+
+}
+
+pub fn decode_use_case_diagram(diagram_input: String) -> Vec<ClassDiagram>{
+    let diagram_input_regex = Regex::new(r"(\w+;.*;.*;.*)").unwrap();
+    let diagram_input = diagram_input.to_string();
+
+    if diagram_input_regex.is_match(diagram_input.as_ref()){
+        let use_case_diagram_comp: Vec<String> = diagram_input.split(&";".to_string()).map(|x| x.to_owned()).collect();
+        return ClassDiagramm::new(use_case_diagram_comp[0].to_string(), decode_actors(use_case_diagram_comp[1].to_string()),
+                                  decode_use_cases(use_case_diagram_comp[2].to_string()), decode_use_case_relations(use_case_diagram_comp[3].to_string()));
+
+
+    }
+    return null;
+}
+
+
+pub fn decode_input(given_input: String) {
+
+    let diagram_regex = Regex::new(r"((Class|UseCase)~.*)").unwrap();
+    let input = given_input.to_string();
+    let mut class_diagram_list = Vec::new();
+    let mut use_case_diagram_list = Vec::new();
+
+    let diagram_strings = given_input.split("---");
+    for dia_str in diagram_strings {
+        if diagram_regex.is_match(dia_str.as_ref()){
+            let diagram_components: Vec<String> = dia_str.split(&"~".to_string()).map(|x| x.to_owned()).collect();
+            if diagram_components[0] == "Class"{
+                class_diagram_list.push(decode_class_diagram(diagram_components[1].to_string()).1);
+            }
+            else if diagram_components[0] == "UseCase"{
+                use_case_diagram_list.push(decode_use_cases(diagram_components[1].to_string()))
+            }
+        }
+    }
 }
 
 fn call_class_draw(class_list: Vec<Class>, relation_list: Vec<Relation>){
