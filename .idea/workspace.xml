@@ -3,8 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="2491d17c-f4c6-423b-873f-a91e50a1a79c" name="Default Changelist" comment="Alles funktioniert jetzt bei richtiger Eingabe, Relations und Klassen implementiert">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/res/UML_visual_result.png" beforeDir="false" afterPath="$PROJECT_DIR$/res/UML_visual_result.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/decoder.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/decoder.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui.rs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -18,35 +19,35 @@
     <session id="-835415652">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="22" />
+          <entry key="project.closed" value="25" />
           <entry key="project.open.time.0" value="3" />
-          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.1" value="2" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.3" value="1" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.5" value="11" />
-          <entry key="project.open.time.6" value="6" />
-          <entry key="project.opened" value="24" />
+          <entry key="project.open.time.6" value="9" />
+          <entry key="project.opened" value="28" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="png" value="2" />
-          <entry key="rs" value="7" />
+          <entry key="png" value="3" />
+          <entry key="rs" value="8" />
           <entry key="toml" value="1" />
-          <entry key="txt" value="1" />
+          <entry key="txt" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Image" value="2" />
-          <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Rust" value="7" />
+          <entry key="Image" value="3" />
+          <entry key="PLAIN_TEXT" value="3" />
+          <entry key="Rust" value="8" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="rs" value="23387" />
+          <entry key="rs" value="26419" />
           <entry key="toml" value="52" />
           <entry key="txt" value="115" />
         </counts>
@@ -54,7 +55,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="140" />
-          <entry key="Rust" value="23387" />
+          <entry key="Rust" value="26419" />
           <entry key="TOML file" value="27" />
         </counts>
       </usages-collector>
@@ -119,25 +120,34 @@
         <entry file="file://$PROJECT_DIR$/demo.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="77" selection-start-column="77" selection-end-column="77" />
+              <caret column="37" selection-end-column="333" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gui.rs">
+        <entry file="file://$PROJECT_DIR$/src/decoder.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="158" column="39" lean-forward="true" selection-start-line="158" selection-start-column="39" selection-end-line="158" selection-end-column="39" />
+            <state relative-caret-position="-435">
+              <caret line="618" column="55" selection-start-line="618" selection-start-column="55" selection-end-line="618" selection-end-column="55" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/usecase syntax.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="96" selection-start-column="96" selection-end-column="96" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/decoder.rs">
+        <entry file="file://$PROJECT_DIR$/src/gui.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="325" column="22" lean-forward="true" selection-start-line="325" selection-start-column="22" selection-end-line="325" selection-end-column="22" />
+            <state relative-caret-position="425">
+              <caret line="193" column="82" selection-start-line="193" selection-start-column="82" selection-end-line="193" selection-end-column="82" />
             </state>
           </provider>
         </entry>
@@ -188,18 +198,18 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/test.rs" />
-        <option value="$PROJECT_DIR$/Cargo.toml" />
         <option value="$PROJECT_DIR$/src/visuals.rs" />
         <option value="$PROJECT_DIR$/src/main.rs" />
         <option value="$PROJECT_DIR$/demo.txt" />
-        <option value="$PROJECT_DIR$/src/gui.rs" />
         <option value="$PROJECT_DIR$/src/decoder.rs" />
+        <option value="$PROJECT_DIR$/Cargo.toml" />
+        <option value="$PROJECT_DIR$/src/gui.rs" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="477" />
-    <option name="y" value="51" />
+    <option name="x" value="51" />
+    <option name="y" value="-8" />
     <option name="width" value="974" />
     <option name="height" value="991" />
   </component>
@@ -235,8 +245,8 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545275993423" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1546488789144" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../fylm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
   </component>
   <component name="RecentsManager">
@@ -310,8 +320,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21215352" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14658849" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -320,7 +331,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946696" weight="0.26868907" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946696" visible="true" weight="0.26868907" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -349,13 +360,10 @@
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/.rustup/toolchains/stable-x86_64-pc-windows-msvc/lib/rustlib/src/rust/src/liballoc/string.rs" />
     <entry file="file://$PROJECT_DIR$/src/test.rs" />
-    <entry file="file://$PROJECT_DIR$/res/UML_visual_result.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/demo.txt">
+    <entry file="file://$PROJECT_DIR$/src/main.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="77" selection-start-column="77" selection-end-column="77" />
+        <state relative-caret-position="306">
+          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -366,6 +374,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/demo.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="37" selection-end-column="333" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/usecase syntax.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="96" selection-start-column="96" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/UML_visual_result.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/Cargo.toml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -373,24 +398,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.rs">
+    <entry file="file://$PROJECT_DIR$/src/decoder.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+        <state relative-caret-position="-435">
+          <caret line="618" column="55" selection-start-line="618" selection-start-column="55" selection-end-line="618" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/gui.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="158" column="39" lean-forward="true" selection-start-line="158" selection-start-column="39" selection-end-line="158" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/decoder.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="325" column="22" lean-forward="true" selection-start-line="325" selection-start-column="22" selection-end-line="325" selection-end-column="22" />
+        <state relative-caret-position="425">
+          <caret line="193" column="82" selection-start-line="193" selection-start-column="82" selection-end-line="193" selection-end-column="82" />
         </state>
       </provider>
     </entry>

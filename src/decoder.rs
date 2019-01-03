@@ -5,7 +5,8 @@ use std::path::Path;
 
 use visuals;
 
-pub struct ClassDiagram{
+#[derive(Debug)]
+pub struct ClassDiagram {
     pub classes: Vec<Class>,
     pub relations: Vec<Relation>,
 }
@@ -173,6 +174,7 @@ impl Relation{
 }
 
 
+#[derive(Debug)]
 pub struct UseCaseDiagramm {
     pub name: String,
     pub actors: Vec<Actor>,
@@ -187,20 +189,22 @@ impl UseCaseDiagramm {
 }
 
 
+#[derive(Debug)]
 pub struct Actor {
     pub id: i32,
     pub name: String,
-    pub extends_from: i32,
+    pub extends_from: Option<i32>,
     pub has_use_case: Vec<i32>,
 }
 
 impl Actor{
-    fn new(id: i32, name: String, extends_from: i32, has_use_case: Vec<i32>) -> Actor{
+    fn new(id: i32, name: String, extends_from: Option<i32>, has_use_case: Vec<i32>) -> Actor{
         Actor {id: id, name: name, extends_from: extends_from, has_use_case: has_use_case}
     }
 }
 
 
+#[derive(Debug)]
 pub struct UseCase {
     pub id: i32,
     pub name: String,
@@ -214,6 +218,7 @@ impl UseCase{
 }
 
 
+#[derive(Debug)]
 pub struct UseCaseRelation {
     pub relation_type: UseCaseRelationType,
     pub from: i32,
@@ -222,11 +227,12 @@ pub struct UseCaseRelation {
 
 impl UseCaseRelation{
     fn new(relation_type: UseCaseRelationType, from: i32, to: i32) -> UseCaseRelation {
-        UseCaseRelation {relation_type: relation, from: from, to: to}
+        UseCaseRelation {relation_type: relation_type, from: from, to: to}
     }
 }
 
 
+#[derive(Debug)]
 pub enum UseCaseRelationType{
     Extends,
     Include,
@@ -468,7 +474,7 @@ fn decode_relations(relations_str: String) -> Vec<Relation>{
 }
 
 
-pub fn decode_class_diagram(given_input: String) -> (String, Vec<ClassDiagram>){
+fn decode_class_diagram(given_input: String) -> Option<ClassDiagram>{
 
     let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
     let input = given_input.to_string();
@@ -484,46 +490,111 @@ pub fn decode_class_diagram(given_input: String) -> (String, Vec<ClassDiagram>){
         if class_relation_vec.len() > 1 {
             relation_list = decode_relations(class_relation_vec[1].to_string());
         }
+
+        return Some(ClassDiagram::new(class_list, relation_list));
     }
 
-    for j in &class_list {
+    /*for j in &class_list {
         println!("{:?}", j);
 
     }
     for i in &relation_list {
         println!("{:?}", i);
-    }
+    }*/
 
-    call_class_draw(class_list, relation_list);
-    return (errors, ClassDiagramm::new(class_list, relation_list));
+    //call_class_draw(class_list, relation_list);
+    return None;
 }
 
 fn decode_actors(actors_str: String) -> Vec<Actor>{
+    let actor_regex = Regex::new(r"(\d+:\w+:(\d+)?:(\d+( )?)?)").unwrap();
+    let mut actors_return = Vec::new();
 
+    let actors_strings = actors_str.split(",");
+    for ac_str in actors_strings {
+        if actor_regex.is_match(ac_str.as_ref()){
+
+            let mut ac_uc_str = String::new();
+            let actor_components: Vec<String> = ac_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
+            let mut actor_use_cases = Vec::new();
+
+            let mut extends_from = None;
+            if (actor_components[2].to_string() != ""){
+                extends_from = Some(actor_components[2].to_string().parse::<i32>().unwrap());
+            }
+
+            ac_uc_str = actor_components[3].to_string();
+            let actor_use_cases_str = ac_uc_str.split(" ");
+            for ac_to_use_str in actor_use_cases_str {
+                actor_use_cases.push(ac_to_use_str.to_string().parse::<i32>().unwrap());
+            }
+
+            actors_return.push(Actor::new(actor_components[0].to_string().parse::<i32>().unwrap(), actor_components[1].to_string(),
+                                          extends_from, actor_use_cases))
+        }
+    }
+    return actors_return;
 }
+
 
 fn decode_use_cases(use_cases_str: String) -> Vec<UseCase>{
     let use_case_regex = Regex::new(r"((\d+:\w+:(EP)?)(,)?)*").unwrap();
+    let mut use_case_return = Vec::new();
 
+    let use_case_strings = use_cases_str.split(",");
+    for uc_str in use_case_strings {
+        if use_case_regex.is_match(uc_str.as_ref()) {
 
+            let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
+
+            use_case_return.push(UseCase::new(use_case_components[0].to_string().parse::<i32>().unwrap(),
+                                              use_case_components[1].to_string(), use_case_components[2].to_string() != ""));
+        }
+    }
+
+    return use_case_return;
 }
 
 fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRelation>{
+    let relation_use_case_regex = Regex::new(r"((E|I):\d+->\d+)").unwrap();
+    let mut relation_uc_return = Vec::new();
 
+    let use_cases_realtions_strings = use_cases_relations_str.split(",");
+    for rel_uc_str in use_cases_realtions_strings {
+        if relation_use_case_regex.is_match(rel_uc_str.as_ref()) {
+
+            let relation_uc_components: Vec<String> = rel_uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
+
+            let mut relation_type_uc: UseCaseRelationType;
+            match relation_uc_components[0].as_ref(){
+                "E" => relation_type_uc = UseCaseRelationType::Extends,
+                "I" => relation_type_uc = UseCaseRelationType::Include,
+                _=> continue,
+            }
+
+            let mut from_to_vec: Vec<i32> = Vec::new();
+            for f_t_uc in relation_uc_components[1].split("->"){
+                from_to_vec.push(f_t_uc.parse::<i32>().unwrap());
+            }
+
+            relation_uc_return.push(UseCaseRelation::new(relation_type_uc, from_to_vec[0], from_to_vec[1]));
+        }
+    }
+    return relation_uc_return;
 }
 
-pub fn decode_use_case_diagram(diagram_input: String) -> Vec<ClassDiagram>{
+pub fn decode_use_case_diagram(diagram_input: String) -> Option<UseCaseDiagramm>{
     let diagram_input_regex = Regex::new(r"(\w+;.*;.*;.*)").unwrap();
     let diagram_input = diagram_input.to_string();
 
     if diagram_input_regex.is_match(diagram_input.as_ref()){
         let use_case_diagram_comp: Vec<String> = diagram_input.split(&";".to_string()).map(|x| x.to_owned()).collect();
-        return ClassDiagramm::new(use_case_diagram_comp[0].to_string(), decode_actors(use_case_diagram_comp[1].to_string()),
-                                  decode_use_cases(use_case_diagram_comp[2].to_string()), decode_use_case_relations(use_case_diagram_comp[3].to_string()));
+        return Some(UseCaseDiagramm::new(use_case_diagram_comp[0].to_string(), decode_actors(use_case_diagram_comp[1].to_string()),
+                                  decode_use_cases(use_case_diagram_comp[2].to_string()), decode_use_case_relations(use_case_diagram_comp[3].to_string())));
 
 
     }
-    return null;
+    return None;
 }
 
 
@@ -539,12 +610,28 @@ pub fn decode_input(given_input: String) {
         if diagram_regex.is_match(dia_str.as_ref()){
             let diagram_components: Vec<String> = dia_str.split(&"~".to_string()).map(|x| x.to_owned()).collect();
             if diagram_components[0] == "Class"{
-                class_diagram_list.push(decode_class_diagram(diagram_components[1].to_string()).1);
+                let class_return = decode_class_diagram(diagram_components[1].to_string());
+                match class_return {
+                    Some(class_return) => class_diagram_list.push(class_return),
+                    None => continue,
+                }
             }
             else if diagram_components[0] == "UseCase"{
-                use_case_diagram_list.push(decode_use_cases(diagram_components[1].to_string()))
+                let uc_return = decode_use_case_diagram(diagram_components[1].to_string());
+                match uc_return {
+                    Some(uc_return) => use_case_diagram_list.push(uc_return),
+                    None => continue,
+                }
             }
         }
+    }
+
+    for j in &class_diagram_list {
+        println!("{:?}", j);
+
+    }
+    for i in &use_case_diagram_list {
+        println!("{:?}", i);
     }
 }
 

@@ -37,6 +37,37 @@ pub struct Content {
     pub start_button: Button,
 }
 
+#[derive(Clone)]
+pub struct Notebook {
+    notebook: gtk::Notebook,
+    tabs: Vec<gtk::Box>
+}
+
+impl Notebook {
+    fn new() -> Notebook {
+        Notebook {
+            notebook: gtk::Notebook::new(),
+            tabs: Vec::new()
+        }
+    }
+
+
+    fn create_tab(&mut self, title: &str, image: String) {
+        println!("fdfdf");
+        let label = gtk::Label::new(title);
+        let tab = gtk::Box::new(Orientation::Horizontal, 0);
+
+        tab.pack_start(&label, false, false, 0);
+        tab.show_all();
+
+        let img = Image::new_from_file("res/UML_visual_result.png");
+        self.notebook.append_page(&img, Some(&tab));
+
+        self.tabs.push(tab);
+    }
+
+}
+
 
 impl UmlGUI {
     fn new() -> UmlGUI {
@@ -114,6 +145,8 @@ impl Content {
 
         let left_pane_image: Rc<RefCell<Image>> = Rc::new(RefCell::new(Image::new()));
 
+        let mut notebook: Rc<RefCell<Notebook>> = Rc::new(RefCell::new(Notebook::new()));
+
         let input = TextBuffer::new(None);
         let input_view = TextView::new_with_buffer(&input);
 
@@ -139,12 +172,16 @@ impl Content {
         let input_clone = input.clone();
         let left_pane_clone = left_pane_image.clone();
         let label_clone = noti_label.clone();
+        let mut notebook_clone = notebook.clone();
         start_button.connect_clicked(move |start_button| {
-            let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
-            label_clone.set_text(errors.as_ref());
+            //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+            //label_clone.set_text(errors.as_ref());
+
+            //decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
 
             //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
-            Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
+            //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
+            notebook_clone.borrow_mut().create_tab("fdf", "res/UML_visual_result.png".to_string());
         });
 
         input_view.set_editable(true);
@@ -154,7 +191,9 @@ impl Content {
         input_scrolled.add(&input_view);
 
         let left_pane = ScrolledWindow::new(None, None);
-        left_pane.add(&*left_pane_image.borrow_mut());
+        notebook.borrow_mut().create_tab("fdf", "res/UML_visual_result.png".to_string());
+        left_pane.add(&notebook.borrow_mut().notebook);
+        //left_pane.add(&*left_pane_image.borrow_mut());
 
         right_pane.set_border_width(5);
         right_pane.pack_start(&class_template_button, false, false, 0);
