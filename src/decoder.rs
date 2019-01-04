@@ -598,7 +598,7 @@ pub fn decode_use_case_diagram(diagram_input: String) -> Option<UseCaseDiagramm>
 }
 
 
-pub fn decode_input(given_input: String) {
+pub fn decode_input(given_input: String) -> i32{
 
     let diagram_regex = Regex::new(r"((Class|UseCase)~.*)").unwrap();
     let input = given_input.to_string();
@@ -625,20 +625,26 @@ pub fn decode_input(given_input: String) {
             }
         }
     }
-
-    for j in &class_diagram_list {
-        println!("{:?}", j);
-
+    for j in 0..class_diagram_list.len(){
+        call_class_draw(&class_diagram_list[j].classes, &class_diagram_list[j].relations, j as i32)
     }
+
+
     for i in &use_case_diagram_list {
         println!("{:?}", i);
     }
+
+    return class_diagram_list.len() as i32;
 }
 
-fn call_class_draw(class_list: Vec<Class>, relation_list: Vec<Relation>){
-    let path = Path::new("res/UML_visual_result.png");
+fn call_class_draw(class_list: &Vec<Class>, relation_list: &Vec<Relation>, class_number: i32){
+    let path_first_part = "res/UML_visual_result";
+    let path_ending = ".png";
+    let path_str = [path_first_part, path_ending].join(&class_number.to_string());
+    let path = Path::new(&path_str);
+
     let mut image = visuals::erstelle_image();
-    for i in &class_list {
+    for i in class_list {
 
         let mut klassentyp = "";
         if let ClassType::Class = i.class_type {
@@ -653,7 +659,7 @@ fn call_class_draw(class_list: Vec<Class>, relation_list: Vec<Relation>){
 
     }
 
-    for j in &relation_list {
+    for j in relation_list {
         let mut pfeiltyp = "";
         if let RelationType::Vererbung = j.relation_type {
             pfeiltyp = "ver";

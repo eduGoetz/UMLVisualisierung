@@ -29,7 +29,7 @@ pub struct Header {
 
 pub struct Content {
     pub container: Paned,
-    pub left_pane: ScrolledWindow,
+    pub notebook: Rc<RefCell<Notebook>>,
     pub input: TextBuffer,
     pub class_template_button: Button,
     pub relation_template_button: Button,
@@ -52,16 +52,19 @@ impl Notebook {
     }
 
 
-    fn create_tab(&mut self, title: &str, image: String) {
-        println!("fdfdf");
+    fn create_tab(&mut self, title: &str, image_path: String) {
         let label = gtk::Label::new(title);
         let tab = gtk::Box::new(Orientation::Horizontal, 0);
 
         tab.pack_start(&label, false, false, 0);
         tab.show_all();
 
-        let img = Image::new_from_file("res/UML_visual_result.png");
-        self.notebook.append_page(&img, Some(&tab));
+        let img = Image::new_from_file(&image_path);
+
+        let scoll_pane = ScrolledWindow::new(None, None);
+        scoll_pane.add(&img);
+
+        self.notebook.append_page(&scoll_pane, Some(&tab));
 
         self.tabs.push(tab);
     }
@@ -173,16 +176,6 @@ impl Content {
         let left_pane_clone = left_pane_image.clone();
         let label_clone = noti_label.clone();
         let mut notebook_clone = notebook.clone();
-        start_button.connect_clicked(move |start_button| {
-            //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
-            //label_clone.set_text(errors.as_ref());
-
-            //decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
-
-            //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
-            //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
-            notebook_clone.borrow_mut().create_tab("fdf", "res/UML_visual_result.png".to_string());
-        });
 
         input_view.set_editable(true);
         input_view.set_wrap_mode(WrapMode::Char);
@@ -190,9 +183,8 @@ impl Content {
         let input_scrolled = ScrolledWindow::new(None, None);
         input_scrolled.add(&input_view);
 
-        let left_pane = ScrolledWindow::new(None, None);
-        notebook.borrow_mut().create_tab("fdf", "res/UML_visual_result.png".to_string());
-        left_pane.add(&notebook.borrow_mut().notebook);
+        //let left_pane = ScrolledWindow::new(None, None);
+        //left_pane.add(&notebook.borrow_mut().notebook);
         //left_pane.add(&*left_pane_image.borrow_mut());
 
         right_pane.set_border_width(5);
@@ -202,10 +194,10 @@ impl Content {
         right_pane.pack_start(&noti_label, false, true, 0);
         right_pane.pack_start(&start_button, false, true, 0);
 
-        container.pack1(&left_pane, true, true);
+        container.pack1(&notebook.borrow_mut().notebook, true, true);
         container.pack2(&right_pane, true, true);
 
-        Content { container, left_pane, input, class_template_button, relation_template_button, noti_label, start_button }
+        Content { container, notebook, input, class_template_button, relation_template_button, noti_label, start_button }
 
     }
 }
@@ -218,6 +210,29 @@ pub fn gui_main() {
     }
 
     let mut gui = UmlGUI::new();
+
+    let window_clone = gui.window.clone();
+    //let notebook = gui.content.notebook;
+    let notebook_clone = gui.content.notebook.clone();
+    let input_clone = gui.content.input.clone();
+    gui.content.start_button.connect_clicked(move |_| {
+        //for tab in &notebook_clone.borrow_mut().tabs{
+        //    notebook_clone.borrow_mut().notebook.detach_tab(tab);
+        //}
+                                                                                                            ////notebook_clone.borrow_mut().tabs.clear();
+        //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+        //label_clone.set_text(errors.as_ref());
+
+        let class_amount = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+
+        //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
+        //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
+        for i in 0..class_amount {
+            notebook_clone.borrow_mut().create_tab(&["ClassDiagramm", &i.to_string()].join(""), ["res/UML_visual_result", ".png"].join(&i.to_string()));
+            window_clone.show_all();
+        }
+    });
+
     gui.window.show_all();
     gtk::main();
 }
