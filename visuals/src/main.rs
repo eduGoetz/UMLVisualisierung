@@ -16,6 +16,6 @@ mod visuals;
 
 fn main() {
 
-    visuals::erstelle_use_case();
+    visuals::main();
     gui::gui_main();
 }

@@ -86,36 +86,57 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
     return(image)
 }
 
-fn main() {
-    erstelle_use_case();
+pub fn main() {
+    let mut image=erstelle_use_case("TEST");
+    create_akteur(image,5,3);
 }
 
-pub fn erstelle_use_case() {
+pub fn erstelle_use_case(systemname:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image = erstelle_image();
     let file = Path::new("res/UML_visual_result.png");
-    let mut person = 2;
+
     let mut von = "1";
     let mut nach = "2";
-    image = zeichne_systemgrenze(image, "Überschrift");
-    image = zeichne_case(image,2);
-    image = zeichne_case(image,1);
-    image = zeichne_case(image,8);
-    image = zeichne_case(image,3);
-    image = zeichne_case(image,4);
-    image = zeichne_case(image,7);
-    image = zeichne_case_mit_assoziation_akteur(image,5, person, von, nach);
-    image = zeichne_case_mit_assoziation_system(image,6, person, von, nach);
-    image = zeichne_akteur(image, 0, 5);
-    image = beschrifte_akteur(image, 3, "katze");
-    image = zeichne_beziehung_akteur(image, 3, 2);
-    image=zeichne_case_extend(image, 9);
-    image = zeichne_system_akteur(image, 0, 5);
-    image = beschrifte_system_akteur(image, 2, "hund");
+    let mut systemname=systemname;
+    image = draw_systemborder(image, systemname);
+    image = draw_case(image,2);
+    image = draw_case(image,1);
+    image = draw_case(image,8);
+    image = draw_case(image,3);
+    image = draw_case(image,4);
+    image = draw_case(image,7);
 
-    image=zeichne_pfeil(image,5,2);
+
+    image = draw_case_with_assoziation(image,5, 2, von, nach,"l");
+    image = draw_case_with_assoziation(image,6, 2, von, nach,"r");
+
+
+
+    image = draw_relationship_akteur(image, 3, 2);
+    image = draw_case_extend(image, 9);
+
+    image=name_case(image,5,"Hallo");
+    image=draw_arrow(image,5,7,"'Extend'");
 
     let _ = image.save(file).unwrap();
-    fn zeichne_systemgrenze(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    return(image);
+}
+pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_l:i32,person_r:i32){
+    let mut image=image;
+    let file = Path::new("res/UML_visual_result.png");
+    let mut person_l = person_l;
+    let mut person_r=person_r;
+    let mut side=side;
+
+    image = draw_akteur(image, 0, person_l,"l");
+    image = name_akteur(image, person_l, "katze","l");
+    image = draw_akteur(image, 0, person_r,"r");
+    image = name_akteur(image, person_r, "hund","r");
+    let _ = image.save(file).unwrap();
+
+}
+
+    fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Bold.ttf") as &[u8]);
         let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
         let schrift = Scale { x: 20.0, y: 20.0 };
@@ -127,7 +148,7 @@ pub fn erstelle_use_case() {
         draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 400, 20, schrift, &font, name);
         return (image);
     }
-    fn zeichne_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, ist_anzahl_guys: i32, soll_anzahl_guys: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, ist_anzahl_guys: i32, soll_anzahl_guys: i32,side: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
@@ -135,6 +156,7 @@ pub fn erstelle_use_case() {
         let schrift = Scale { x: 10.0, y: 10.0 };
         let mut ist_anzahl_guys = ist_anzahl_guys;
         let mut soll_anzahl_guys = soll_anzahl_guys;
+        let mut side=side;
         let mut fertig = false;
         let mut x_anfang = 80;
         let mut head_anfang = 50;
@@ -142,26 +164,47 @@ pub fn erstelle_use_case() {
         let mut arm_anfang = 70;
         let mut bein_anfang = 90;
         let mut bein_ende = 110;
-        while !fertig {
-            draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((90 as f32), (body_anfang as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((70 as f32), (body_anfang as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((90 as f32), (bein_ende as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((70 as f32), (bein_ende as f32)), draw_color);
-            head_anfang = head_anfang + 130;
-            body_anfang = body_anfang + 130;
-            arm_anfang = arm_anfang + 130;
-            bein_anfang = bein_anfang + 130;
-            bein_ende = bein_ende + 130;
-            ist_anzahl_guys = ist_anzahl_guys + 1;
-            if ist_anzahl_guys == soll_anzahl_guys {
-                fertig = true;
+        if side=="l" {
+            while !fertig {
+                draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((90 as f32), (body_anfang as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((70 as f32), (body_anfang as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((90 as f32), (bein_ende as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((70 as f32), (bein_ende as f32)), draw_color);
+                head_anfang = head_anfang + 130;
+                body_anfang = body_anfang + 130;
+                arm_anfang = arm_anfang + 130;
+                bein_anfang = bein_anfang + 130;
+                bein_ende = bein_ende + 130;
+                ist_anzahl_guys = ist_anzahl_guys + 1;
+                if ist_anzahl_guys == soll_anzahl_guys {
+                    fertig = true;
+                }
+            }
+        }else if side=="r"{
+            x_anfang = 920;
+            while !fertig {
+                draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((910 as f32), (body_anfang as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((930 as f32), (body_anfang as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((910 as f32), (bein_ende as f32)), draw_color);
+                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((930 as f32), (bein_ende as f32)), draw_color);
+                head_anfang = head_anfang + 130;
+                body_anfang = body_anfang + 130;
+                arm_anfang = arm_anfang + 130;
+                bein_anfang = bein_anfang + 130;
+                bein_ende = bein_ende + 130;
+                ist_anzahl_guys = ist_anzahl_guys + 1;
+                if ist_anzahl_guys == soll_anzahl_guys {
+                    fertig = true;
+                }
             }
         }
         return (image);
     }
-    fn beschrifte_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person: i32, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn name_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person: i32, name: &str,side: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
         let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
         let schrift = Scale { x: 10.0, y: 10.0 };
@@ -169,59 +212,16 @@ pub fn erstelle_use_case() {
         let mut bein_ende = 110;
         let mut person = person - 1;
         let mut name = name;
+        let mut side=side;
         bein_ende = bein_ende + (130 * person);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 70, (bein_ende + 10) as u32, schrift, &font, name);
-        return (image);
-    }
-    fn zeichne_system_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, ist_anzahl_guys: i32, soll_anzahl_guys: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-        let draw_color = Rgb([0u8, 0u8, 0u8]);
-        let mut image = image;
-        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
-        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-        let schrift = Scale { x: 10.0, y: 10.0 };
-        let mut ist_anzahl_guys = ist_anzahl_guys;
-        let mut soll_anzahl_guys = soll_anzahl_guys;
-        let mut fertig = false;
-        let mut x_anfang = 920;
-        let mut head_anfang = 50;
-        let mut body_anfang = 60;
-        let mut arm_anfang = 70;
-        let mut bein_anfang = 90;
-        let mut bein_ende = 110;
-        while !fertig {
-            draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((910 as f32), (body_anfang as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((930 as f32), (body_anfang as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((910 as f32), (bein_ende as f32)), draw_color);
-            draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((930 as f32), (bein_ende as f32)), draw_color);
-            head_anfang = head_anfang + 130;
-            body_anfang = body_anfang + 130;
-            arm_anfang = arm_anfang + 130;
-            bein_anfang = bein_anfang + 130;
-            bein_ende = bein_ende + 130;
-            ist_anzahl_guys = ist_anzahl_guys + 1;
-            if ist_anzahl_guys == soll_anzahl_guys {
-                fertig = true;
-            }
+        if side=="l" {
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 70, (bein_ende + 10) as u32, schrift, &font, name);
+        }if side=="r"{
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 910, (bein_ende + 10) as u32, schrift, &font, name);
         }
-
-
         return (image);
     }
-    fn beschrifte_system_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person: i32, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
-        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-        let schrift = Scale { x: 10.0, y: 10.0 };
-        let mut image = image;
-        let mut bein_ende = 110;
-        let mut person = person - 1;
-        let mut name = name;
-        bein_ende = bein_ende + (130 * person);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), 910, (bein_ende + 10) as u32, schrift, &font, name);
-        return (image);
-    }
-    fn zeichne_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let mut stelle=stelle;
@@ -231,47 +231,35 @@ pub fn erstelle_use_case() {
         draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
         return (image);
     }
-    fn zeichne_case_mit_assoziation_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32, person: i32, von: &str, nach: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_case_with_assoziation(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32, person: i32, von: &str, nach: &str,side: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
         let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
         let schrift = Scale { x: 10.0, y: 10.0 };
-        let mut stelle=stelle;
+        let mut stelle = stelle;
         let mut tuple = get_case_koordinaten(stelle);
-        let mut x_anfang=80;
+        let mut x_anfang = 80;
         let mut y_ellipse = tuple.1;
         let mut x_ellipse = tuple.0;
         let mut person = person - 1;
         let mut anfang = 75;
         anfang = anfang + (130 * person);
-        draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse - 50) as f32, y_ellipse as f32), draw_color);
-        draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang + 10) as u32, (anfang - 5) as u32, schrift, &font, von);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse - 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
+        if side == "l" {
+            draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse - 50) as f32, y_ellipse as f32), draw_color);
+            draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang + 10) as u32, (anfang - 5) as u32, schrift, &font, von);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse - 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
+        } else if side == "r" {
+            x_anfang = 920;
+            draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse + 50) as f32, y_ellipse as f32), draw_color);
+            draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang - 10) as u32, (anfang - 5) as u32, schrift, &font, von);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse + 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
+        }
         return (image);
     }
-    fn zeichne_case_mit_assoziation_system(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32, person: i32, von: &str, nach: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-        let draw_color = Rgb([0u8, 0u8, 0u8]);
-        let mut image = image;
-        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
-        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-        let schrift = Scale { x: 10.0, y: 10.0 };
-        let mut stelle=stelle;
-        let mut tuple = get_case_koordinaten(stelle);
-        let mut x_anfang=920;
-        let mut y_ellipse = tuple.1;
-        let mut x_ellipse = tuple.0;
-        let mut person = person - 1;
-        let mut anfang = 75;
-        anfang = anfang + (130 * person);
-        draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse + 50) as f32, y_ellipse as f32), draw_color);
-        draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang - 10) as u32, (anfang - 5) as u32, schrift, &font, von);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse + 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
-        return (image);
-    }
-    fn zeichne_beziehung_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person_von: i32, person_nach: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_relationship_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person_von: i32, person_nach: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let mut person_von = person_von - 1;
@@ -285,7 +273,7 @@ pub fn erstelle_use_case() {
         draw_line_segment_mut(&mut image, ((kopf_oben_x - 10) as f32, (kopf_oben_y - 30) as f32), ((kopf_oben_x + 10) as f32, (kopf_oben_y - 30) as f32), draw_color);
         return (image);
     }
-    fn zeichne_case_extend(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, stelle: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_case_extend(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, stelle: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let mut stelle=stelle;
@@ -327,9 +315,13 @@ pub fn erstelle_use_case() {
         }
         return (x_ellipse,y_ellipse,spalte,reihe);
     }
-    fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, von: i32,nach: i32)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_arrow(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, von: i32,nach: i32,beschriftung: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let draw_white = Rgb([255u8, 255u8, 255u8]);
+        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
+        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+        let schrift = Scale { x: 13.0, y: 13.0 };
+        let mut beschriftung=beschriftung;
         let mut image=image;
         let mut von=get_case_koordinaten(von);
         let mut nach=get_case_koordinaten(nach);
@@ -469,19 +461,35 @@ pub fn erstelle_use_case() {
         if richtung_pfeil=="links" {
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y-10) as f32), draw_color);
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y+10 ) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+30)as u32 , (ende_y+5) as u32, schrift, &font, beschriftung);
         }else if richtung_pfeil=="rechts"{
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y-10) as f32), draw_color);
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y+10 ) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x-80)as u32 , (ende_y+5) as u32, schrift, &font, beschriftung);
         }else if richtung_pfeil=="oben"{
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y+10) as f32), draw_color);
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y+10 ) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+8)as u32 , (ende_y+10) as u32, schrift, &font, beschriftung);
         }else if richtung_pfeil=="unten"{
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y-10) as f32), draw_color);
             draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y-10 ) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+8)as u32 , (ende_y-10) as u32, schrift, &font, beschriftung);
+
         }
         return(image);
     }
-}
+    fn name_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32,text: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+        let mut image=image;
+        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
+        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+        let schrift = Scale { x: 13.0, y: 13.0 };
+        let mut stelle=stelle;
+        let mut text=text;
+        let mut tuple = get_case_koordinaten(stelle);
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(tuple.0-45)as u32 , (tuple.1-5) as u32, schrift, &font, text);
+        return(image);
+    }
+
 fn zeiche_pfeil_richtung_eins(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,zwischen_x: i32,zwischen_y: i32,dazu: i32,dazu_y: i32,richtung_h: &str,richtung_w: &str)
     ->(i32,i32,i32,i32,i32,i32){
     let mut start_x=start_x;
@@ -563,7 +571,6 @@ fn zeiche_pfeil_richtung_eins(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,
     }
     return(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y)
 }
-
 fn zeiche_pfeil_richtung_zwei(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,zwischen_x: i32,zwischen_y: i32,dazu: i32,dazu_y: i32,anderes: i32,richtung_h: &str,richtung_w: &str)
                          ->(i32,i32,i32,i32,i32,i32){
     let mut start_x=start_x;
@@ -651,7 +658,6 @@ fn zeiche_pfeil_richtung_zwei(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,
     }
     return(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y)
 }
-
 pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: &Vec<Attribute>,vec_methode: &Vec<Method>)
               ->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){//,i32,i32){//,HashMap<u32, i32>) {
 
@@ -1015,96 +1021,44 @@ fn koordinaten(anzahl:i32)->(u32,u32,u32,u32,i32,u32) {
     let mut zweiter_wert_x=180;
     let mut mitte_unterseite=0;
 	let mut anzahl=anzahl;
-    if anzahl == 1{
-        erster_wert=30;
-        zweiter_wert=180;
-        erster_wert_x=30;
-        zweiter_wert_x=180;
-        mitte_unterseite=0;
-    }if anzahl == 2{
-        erster_wert=30;
-        zweiter_wert=180;
-        erster_wert_x=280;
-        zweiter_wert_x=430;
-        mitte_unterseite=10;
-    }if anzahl == 3{
-        erster_wert=30;
-        zweiter_wert=180;
-        erster_wert_x=530;
-        zweiter_wert_x=680;
-        mitte_unterseite=20;
-    }if anzahl == 4{
-        erster_wert=30;
-        zweiter_wert=180;
-        erster_wert_x=780;
-        zweiter_wert_x=930;
-        mitte_unterseite=30;
-    }if anzahl == 5{
-        erster_wert=300;
-        zweiter_wert=450;
-        erster_wert_x=780;
-        zweiter_wert_x=930;
-        mitte_unterseite=40;
-    }if anzahl == 6{
-        erster_wert=300;
-        zweiter_wert=450;
-        erster_wert_x=530;
-        zweiter_wert_x=680;
-        mitte_unterseite=50;
-    }if anzahl == 7{
-        erster_wert=300;
-        zweiter_wert=450;
-        erster_wert_x=280;
-        zweiter_wert_x=430;
-        mitte_unterseite=60;
-    }if anzahl == 8{
-        erster_wert=300;
-        zweiter_wert=450;
-        erster_wert_x=30;
-        zweiter_wert_x=180;
-        mitte_unterseite=70;
-    }if anzahl == 9{
-        erster_wert=570;
-        zweiter_wert=720;
-        erster_wert_x=30;
-        zweiter_wert_x=180;
-        mitte_unterseite=80;
-    }if anzahl == 10{
-        erster_wert=570;
-        zweiter_wert=720;
-        erster_wert_x=280;
-        zweiter_wert_x=430;
-        mitte_unterseite=90;
-    }if anzahl == 11{
-        erster_wert=570;
-        zweiter_wert=720;
-        erster_wert_x=530;
-        zweiter_wert_x=680;
-        mitte_unterseite=100;
-    }if anzahl == 12{
-        erster_wert=570;
-        zweiter_wert=720;
-        erster_wert_x=780;
-        zweiter_wert_x=930;
-        mitte_unterseite=110;
-    }if anzahl == 13{
-        erster_wert=840;
-        zweiter_wert=990;
-        erster_wert_x=630;
-        zweiter_wert_x=930;
-        mitte_unterseite=120;
-    }if anzahl == 14{
-        erster_wert=840;
-        zweiter_wert=990;
-        erster_wert_x=230;
-        zweiter_wert_x=530;
-        mitte_unterseite=130;
-    }if anzahl == 15{
-        erster_wert=840;
-        zweiter_wert=990;
-        erster_wert_x=1;
-        zweiter_wert_x=130;
-        mitte_unterseite=140;
+    let mut ist_anzahl=0;
+    while anzahl==ist_anzahl {
+        if anzahl<5 {
+            erster_wert = 30;
+            zweiter_wert=180;
+        }if anzahl>=5&&anzahl<9 {
+            erster_wert =300 ;
+            zweiter_wert=450;
+        }if anzahl>=9&&anzahl<13 {
+            erster_wert =570;
+            zweiter_wert=720;
+        }if anzahl==13&&anzahl==14||anzahl==15 {
+            erster_wert =840;
+            zweiter_wert=990;
+        }if anzahl==1||anzahl==8||anzahl==9{
+            erster_wert_x=30;
+            zweiter_wert_x=180;
+        }if anzahl==2||anzahl==7||anzahl==10{
+            erster_wert_x=280;
+            zweiter_wert_x=430;
+        }if anzahl==3||anzahl==6||anzahl==11{
+            erster_wert_x=530;
+            zweiter_wert_x=680;
+        }if anzahl==4||anzahl==5||anzahl==12{
+            erster_wert_x=530;
+            zweiter_wert_x=680;
+        }if anzahl == 13{
+            erster_wert_x=630;
+            zweiter_wert_x=930;
+        }if anzahl == 14{
+            erster_wert_x=230;
+            zweiter_wert_x=530;
+        }if anzahl == 15{
+            erster_wert_x=1;
+            zweiter_wert_x=130;
+        }
+        mitte_unterseite=mitte_unterseite+10;
+        ist_anzahl=ist_anzahl+1;
     }
     return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl,mitte_unterseite);
 }
