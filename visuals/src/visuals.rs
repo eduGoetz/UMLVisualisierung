@@ -87,55 +87,85 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 }
 
 pub fn main() {
-    let mut image=erstelle_use_case("TEST");
-    create_akteur(image,5,3);
+    let mut image=create_use_case("TEST");
+    image=create_akteur(image,3,"l","links");
+    image=create_akteur(image,5,"r","rechts");
+    image=create_case(image,6,"extend","l",3,"von","nach","test text");
+    image=create_case(image,8,"normal","l",3,"von","nach","test text");
+    image=create_relation(image,2,1,true,6,8,true,false,"r");
 }
 
-pub fn erstelle_use_case(systemname:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_use_case(systemname:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image = erstelle_image();
     let file = Path::new("res/UML_visual_result.png");
-
-    let mut von = "1";
-    let mut nach = "2";
     let mut systemname=systemname;
     image = draw_systemborder(image, systemname);
-    image = draw_case(image,2);
-    image = draw_case(image,1);
-    image = draw_case(image,8);
-    image = draw_case(image,3);
-    image = draw_case(image,4);
-    image = draw_case(image,7);
-
-
-    image = draw_case_with_assoziation(image,5, 2, von, nach,"l");
-    image = draw_case_with_assoziation(image,6, 2, von, nach,"r");
-
-
-
-    image = draw_relationship_akteur(image, 3, 2);
-    image = draw_case_extend(image, 9);
-
-    image=name_case(image,5,"Hallo");
-    image=draw_arrow(image,5,7,"'Extend'");
-
     let _ = image.save(file).unwrap();
     return(image);
 }
-pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_l:i32,person_r:i32){
+//image,welche position vom akteur,welche seite(l,r),akteur name
+pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,position:i32,side: &str,name:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
     let file = Path::new("res/UML_visual_result.png");
-    let mut person_l = person_l;
-    let mut person_r=person_r;
+    let mut position = position;
     let mut side=side;
+    let mut name=name;
 
-    image = draw_akteur(image, 0, person_l,"l");
-    image = name_akteur(image, person_l, "katze","l");
-    image = draw_akteur(image, 0, person_r,"r");
-    image = name_akteur(image, person_r, "hund","r");
+    image = draw_akteur(image, 0, position,side);
+    image = name_akteur(image, position, name,side);
     let _ = image.save(file).unwrap();
+    return(image);
 
 }
-
+//from ist beziehung von und to ist beziehung zu (akteur,relation)
+//image,wo das case erstellt wird (3 pro zeile),case art(normal,asso,extend),
+// bei asso von welcher seite(l,r),bei asso text bei akteur,bei asso text bei case,text im case
+pub fn create_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,place:i32,kind:&str,side:&str,person:i32,from:&str,to:&str,text:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    let file = Path::new("res/UML_visual_result.png");
+    let mut image=image;
+    let mut place=place;
+    let mut kind=kind;
+    let mut side=side;
+    let mut person=person;
+    let mut from=from;
+    let mut to=to;
+    let mut text=text;
+    if kind=="normal" {
+        image = draw_case(image, place);
+    }else if kind=="asso" {
+        image = draw_case_with_assoziation(image, place, person, from, to, side);
+    }else if kind=="extend" {
+        image = draw_case_extend(image, place);
+    }
+    image=name_case(image,place,text);
+    let _ = image.save(file).unwrap();
+    return(image);
+}
+//image,von person,nach person,true für relation zwischen akteuren,von case,nach case,true für case relation,true für extend/false für implement
+pub fn create_relation (image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,from_person:i32,to_person:i32,relation_akteur:bool,from_case:i32,to_case:i32,relation_case:bool,kind:bool,side:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+    let file = Path::new("res/UML_visual_result.png");
+    let mut image=image;
+    let mut from_person=from_person;
+    let mut to_person=to_person;
+    let mut relation_akteur=relation_akteur;
+    let mut from_case=from_case;
+    let mut to_case=to_case;
+    let mut relation_case=relation_case;
+    let mut kind=kind;
+    let mut side=side;
+    if relation_akteur {
+        image = draw_relationship_akteur(image, from_person, to_person,side);
+    }
+    if relation_case{
+        if kind {
+            image = draw_arrow(image, from_case, to_case, "'Extend'");
+        }else{
+            image = draw_arrow(image, from_case, to_case, "'Implements'");
+        }
+    }
+    let _ = image.save(file).unwrap();
+    return(image);
+}
     fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Bold.ttf") as &[u8]);
         let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
@@ -166,38 +196,42 @@ pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_l:i32,pe
         let mut bein_ende = 110;
         if side=="l" {
             while !fertig {
-                draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((90 as f32), (body_anfang as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((70 as f32), (body_anfang as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((90 as f32), (bein_ende as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((70 as f32), (bein_ende as f32)), draw_color);
+                if soll_anzahl_guys-1==ist_anzahl_guys {
+                    draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((90 as f32), (body_anfang as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((70 as f32), (body_anfang as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((90 as f32), (bein_ende as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((70 as f32), (bein_ende as f32)), draw_color);
+                }
                 head_anfang = head_anfang + 130;
                 body_anfang = body_anfang + 130;
                 arm_anfang = arm_anfang + 130;
                 bein_anfang = bein_anfang + 130;
                 bein_ende = bein_ende + 130;
                 ist_anzahl_guys = ist_anzahl_guys + 1;
-                if ist_anzahl_guys == soll_anzahl_guys {
+                if ist_anzahl_guys == 10 {
                     fertig = true;
                 }
             }
         }else if side=="r"{
             x_anfang = 920;
             while !fertig {
-                draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((910 as f32), (body_anfang as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((930 as f32), (body_anfang as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((910 as f32), (bein_ende as f32)), draw_color);
-                draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((930 as f32), (bein_ende as f32)), draw_color);
+                if soll_anzahl_guys-1==ist_anzahl_guys {
+                    draw_hollow_circle_mut(&mut image, (x_anfang as i32, head_anfang as i32), 10 as i32, draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, body_anfang as f32), (x_anfang as f32, bein_anfang as f32), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((910 as f32), (body_anfang as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, arm_anfang as f32), ((930 as f32), (body_anfang as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((910 as f32), (bein_ende as f32)), draw_color);
+                    draw_line_segment_mut(&mut image, (x_anfang as f32, bein_anfang as f32), ((930 as f32), (bein_ende as f32)), draw_color);
+                }
                 head_anfang = head_anfang + 130;
                 body_anfang = body_anfang + 130;
                 arm_anfang = arm_anfang + 130;
                 bein_anfang = bein_anfang + 130;
                 bein_ende = bein_ende + 130;
                 ist_anzahl_guys = ist_anzahl_guys + 1;
-                if ist_anzahl_guys == soll_anzahl_guys {
+                if ist_anzahl_guys == 10 {
                     fertig = true;
                 }
             }
@@ -259,13 +293,18 @@ pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_l:i32,pe
         }
         return (image);
     }
-    fn draw_relationship_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person_von: i32, person_nach: i32) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    fn draw_relationship_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, person_von: i32, person_nach: i32,side:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
         let mut person_von = person_von - 1;
         let mut person_nach = person_nach - 1;
         let mut kopf_oben_x = 80;
         let mut kopf_oben_y = 50 - 10;
+        let mut side=side;
+        if side=="r" {
+            kopf_oben_x = 920;
+            println!("hdsj");
+        }
         kopf_oben_y = kopf_oben_y + (130 * person_von);
         draw_line_segment_mut(&mut image, ((kopf_oben_x) as f32, (kopf_oben_y) as f32), ((kopf_oben_x) as f32, (kopf_oben_y - 30) as f32), draw_color);
         draw_line_segment_mut(&mut image, (kopf_oben_x as f32, (kopf_oben_y - 50) as f32), ((kopf_oben_x - 10) as f32, (kopf_oben_y - 30) as f32), draw_color);
@@ -339,7 +378,6 @@ pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,person_l:i32,pe
         let mut richtung_h="";
         let mut richtung_w="";
         let mut richtung_pfeil="";
-        println!("von spalte:{},von reihe:{},nach spalte:{},nach reihe{}",spalte_von,reihe_von,spalte_nach,reihe_nach);
        if reihe_von==reihe_nach && spalte_von<=spalte_nach{
            start_x=start_x+50;
            ende_x=ende_x-50;
