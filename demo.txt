@@ -1,1 +1,5 @@
 Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+
+---
+
+Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;

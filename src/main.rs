@@ -11,11 +11,13 @@ use gtk::*;
 
 
 mod decoder;
+mod decoder_class;
+mod decoder_usecase;
 mod gui;
 mod visuals;
 
 fn main() {
 
-    visuals::use_case_hard();
+    //visuals::use_case_hard();
     gui::gui_main();
 }

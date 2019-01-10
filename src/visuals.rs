@@ -5,6 +5,8 @@ extern crate conv;
 //mod decoder;
 
 use decoder::*;
+use decoder_class::*;
+use decoder_usecase::*;
 
 use image::{GenericImage, ImageBuffer, Pixel};
 use imageproc::definitions::{Clamp, Image};
@@ -1728,4 +1730,3 @@ fn koordinaten(anzahl:i32)->(u32,u32,u32,u32,i32,u32) {
     return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl,mitte_unterseite);
 
 }
-

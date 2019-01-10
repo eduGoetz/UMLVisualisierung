@@ -1,4 +1,5 @@
 extern crate gtk;
+
 use gtk::*;
 use gtk::prelude::*;
 use std::process;
@@ -40,14 +41,14 @@ pub struct Content {
 #[derive(Clone)]
 pub struct Notebook {
     notebook: gtk::Notebook,
-    tabs: Vec<gtk::Box>
+    tabs: Vec<gtk::Box>,
 }
 
 impl Notebook {
     fn new() -> Notebook {
         Notebook {
             notebook: gtk::Notebook::new(),
-            tabs: Vec::new()
+            tabs: Vec::new(),
         }
     }
 
@@ -68,7 +69,6 @@ impl Notebook {
 
         self.tabs.push(tab);
     }
-
 }
 
 
@@ -86,14 +86,14 @@ impl UmlGUI {
             dialog.add_button("Öffnen", ResponseType::Accept.into());
 
             let button_select = dialog.run();
-            if button_select == ResponseType::Accept.into(){
+            if button_select == ResponseType::Accept.into() {
                 let file_path = dialog.get_filename().unwrap();
                 let mut file = File::open(file_path).unwrap();
                 let mut file_content = String::new();
                 file.read_to_string(&mut file_content);
                 input_clone.set_text(&file_content);
                 dialog.close();
-            } else if button_select == ResponseType::Cancel.into(){
+            } else if button_select == ResponseType::Cancel.into() {
                 dialog.close();
             }
         });
@@ -113,7 +113,7 @@ impl UmlGUI {
         UmlGUI { window, header, content }
     }
 
-    fn set_new_noti(&mut self, notific: String){
+    fn set_new_noti(&mut self, notific: String) {
         let label_content = self.content.noti_label.get_text().unwrap();
         self.content.noti_label.set_label([label_content, notific].join("\n").as_ref());
     }
@@ -127,7 +127,7 @@ impl Header {
         let open_file = Button::new_with_label("Datei");
 
         let open_doc = Button::new_with_label("Dokumentation");
-        open_doc.connect_clicked(move |_  |{
+        open_doc.connect_clicked(move |_| {
             webbrowser::open("https://github.com/eduGoetz/UMLVisualisierung/blob/master/README.md");
         });
 
@@ -136,7 +136,7 @@ impl Header {
         container.add(&open_file);
         container.add(&open_doc);
 
-        return Header { container, open_file, open_doc }
+        return Header { container, open_file, open_doc };
     }
 }
 
@@ -162,7 +162,7 @@ impl Content {
 
         let relation_template_button = Button::new_with_label("Neues Relation-Template");
         let input_clone = input.clone();
-        relation_template_button.connect_clicked(move |_ | {
+        relation_template_button.connect_clicked(move |_| {
             let template = "Typ;IDvon->IDzu;".to_owned();
             input_clone.set_text([get_current_input(&input_clone), template].join("").as_ref());
         });
@@ -198,7 +198,6 @@ impl Content {
         container.pack2(&right_pane, true, true);
 
         Content { container, notebook, input, class_template_button, relation_template_button, noti_label, start_button }
-
     }
 }
 
@@ -216,14 +215,14 @@ pub fn gui_main() {
     let notebook_clone = gui.content.notebook.clone();
     let input_clone = gui.content.input.clone();
     gui.content.start_button.connect_clicked(move |_| {
-        //for tab in &notebook_clone.borrow_mut().tabs{
-        //    notebook_clone.borrow_mut().notebook.detach_tab(tab);
-        //}
-                                                                                                            ////notebook_clone.borrow_mut().tabs.clear();
         //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
         //label_clone.set_text(errors.as_ref());
 
         let class_amount = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+
+        for j in 0..class_amount as u32 {
+            notebook_clone.borrow_mut().notebook.remove_page(Some(0));
+        }
 
         //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
         //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
