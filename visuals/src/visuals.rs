@@ -3,6 +3,8 @@ extern crate imageproc;
 extern crate rusttype;
 extern crate conv;
 use decoder::*;
+use decoder_class::*;
+use decoder_usecase::*;
 use image::{GenericImage, ImageBuffer, Pixel};
 use imageproc::definitions::{Clamp, Image};
 use conv::ValueInto;
@@ -23,6 +25,7 @@ use std::ops::Mul;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 use image::GenericImageView;
+
 pub fn draw_text_mut<'a, I>(
     image: &'a mut I,
     color: I::Pixel,
@@ -87,83 +90,91 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 }
 
 pub fn main() {
-    let mut image=create_use_case("TEST");
-    image=create_akteur(image,3,"l","links");
-    image=create_akteur(image,5,"r","rechts");
-    image=create_case(image,6,"extend","l",3,"von","nach","test text");
-    image=create_case(image,8,"normal","l",3,"von","nach","test text");
-    image=create_relation(image,2,1,true,6,8,true,false,"r");
-}
 
-pub fn create_use_case(systemname:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-    let mut image = erstelle_image();
-    let file = Path::new("res/UML_visual_result.png");
+//ein ekteur pro push und einzelne sachen mit ; getrennt
+    //wo akteur erstellen,welche seite,name des aktuers,beziehung (true or false),beziehung nach
+    let mut vec_akteure = Vec::new();
+    vec_akteure.push("5;r;name;true;4");
+    vec_akteure.push("4;r;test;false");
+    vec_akteure.push("1;l;namdddse;false");
+
+    //stelle case,art case,bei asso nach,bei asso welche seite,extend,von extend,include,von include,nach include
+    let mut vec_cases = Vec::new();
+    vec_cases.push("1;normal;5;r;false;0;true;2");
+    vec_cases.push("2;asso;5;r;false;0;false;0;1;1");
+    vec_cases.push("5;asso;5;r;false;0;false;0;1;ka");
+    vec_cases.push("8;asso;5;r;false;0;false;0;1;test");
+    vec_cases.push("11;asso;5;r;false;0;false;0;1;hallo");
+    vec_cases.push("3;extend;5;r;true;2;false;0");
+
+    let mut image=erstelle_image();
+    image=create_system_and_akteur(image,"Test",vec_akteure);
+    image=create_cases(image,vec_cases);
+
+}
+pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: Vec<&str>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    let mut image=image;
     let mut systemname=systemname;
-    image = draw_systemborder(image, systemname);
-    let _ = image.save(file).unwrap();
-    return(image);
-}
-//image,welche position vom akteur,welche seite(l,r),akteur name
-pub fn create_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,position:i32,side: &str,name:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-    let mut image=image;
-    let file = Path::new("res/UML_visual_result.png");
-    let mut position = position;
-    let mut side=side;
-    let mut name=name;
+    let mut vec_akteure=vec_akteure;
+    let mut done_create=false;
+    let mut vektor_inhalt="".to_string();
+    let mut vec_stelle=0;
 
-    image = draw_akteur(image, 0, position,side);
-    image = name_akteur(image, position, name,side);
-    let _ = image.save(file).unwrap();
-    return(image);
-
-}
-//from ist beziehung von und to ist beziehung zu (akteur,relation)
-//image,wo das case erstellt wird (3 pro zeile),case art(normal,asso,extend),
-// bei asso von welcher seite(l,r),bei asso text bei akteur,bei asso text bei case,text im case
-pub fn create_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,place:i32,kind:&str,side:&str,person:i32,from:&str,to:&str,text:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
-    let file = Path::new("res/UML_visual_result.png");
-    let mut image=image;
-    let mut place=place;
-    let mut kind=kind;
-    let mut side=side;
-    let mut person=person;
-    let mut from=from;
-    let mut to=to;
-    let mut text=text;
-    if kind=="normal" {
-        image = draw_case(image, place);
-    }else if kind=="asso" {
-        image = draw_case_with_assoziation(image, place, person, from, to, side);
-    }else if kind=="extend" {
-        image = draw_case_extend(image, place);
-    }
-    image=name_case(image,place,text);
-    let _ = image.save(file).unwrap();
-    return(image);
-}
-//image,von person,nach person,true für relation zwischen akteuren,von case,nach case,true für case relation,true für extend/false für implement
-pub fn create_relation (image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,from_person:i32,to_person:i32,relation_akteur:bool,from_case:i32,to_case:i32,relation_case:bool,kind:bool,side:&str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>){
-    let file = Path::new("res/UML_visual_result.png");
-    let mut image=image;
-    let mut from_person=from_person;
-    let mut to_person=to_person;
-    let mut relation_akteur=relation_akteur;
-    let mut from_case=from_case;
-    let mut to_case=to_case;
-    let mut relation_case=relation_case;
-    let mut kind=kind;
-    let mut side=side;
-    if relation_akteur {
-        image = draw_relationship_akteur(image, from_person, to_person,side);
-    }
-    if relation_case{
-        if kind {
-            image = draw_arrow(image, from_case, to_case, "'Extend'");
-        }else{
-            image = draw_arrow(image, from_case, to_case, "'Implements'");
+    image=draw_systemborder(image,systemname);
+    while !done_create {
+        vektor_inhalt=vec_akteure[vec_stelle].to_string();
+        let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
+        let mut position = v[0].parse::<i32>().unwrap();
+        image = draw_akteur(image, 0, position,v[1]);//0 muss da bleiben
+        image = name_akteur(image, position, v[2],v[1]);
+        let mut relation = v[3].parse::<bool>().unwrap();
+        if relation==true {
+            let mut to_position = v[4].parse::<i32>().unwrap();
+            image = draw_relationship_akteur(image, position, to_position,v[1]);
+        }
+        vec_stelle=vec_stelle+1;
+        if vec_stelle==vec_akteure.iter().len(){
+            done_create=true;
         }
     }
-    let _ = image.save(file).unwrap();
+    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    return(image);
+}
+pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: Vec<&str>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    let mut image=image;
+    let mut vec_cases=vec_cases;
+    let mut done_create=false;
+    let mut vektor_inhalt="".to_string();
+    let mut vec_stelle=0;
+
+    while !done_create {
+        vektor_inhalt=vec_cases[vec_stelle].to_string();
+        let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
+        let mut place = v[0].parse::<i32>().unwrap();
+        let mut extend = v[4].parse::<bool>().unwrap();
+        if v[1]=="normal" {
+            image = draw_case(image, place);
+        }else if v[1]=="asso" {
+            let mut person = v[2].parse::<i32>().unwrap();
+            image = draw_case_with_assoziation(image, place, person, v[8], v[9], v[3]);
+        }else if v[1]=="extend" {
+            image = draw_case_extend(image, place);
+        }
+        let mut include = v[6].parse::<bool>().unwrap();
+        if extend==true {
+             let mut from_case = v[5].parse::<i32>().unwrap();
+             image = draw_arrow(image, from_case, place, "'Extend'");
+        }
+        else if include==true{
+            let mut to_case = v[7].parse::<i32>().unwrap();
+            image = draw_arrow(image, place, to_case, "'Include'");
+        }
+        vec_stelle=vec_stelle+1;
+        if vec_stelle==vec_cases.iter().len(){
+            done_create=true;
+        }
+    }
+    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
     return(image);
 }
     fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
@@ -181,9 +192,6 @@ pub fn create_relation (image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,from_person:
     fn draw_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, ist_anzahl_guys: i32, soll_anzahl_guys: i32,side: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
         let draw_color = Rgb([0u8, 0u8, 0u8]);
         let mut image = image;
-        let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
-        let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-        let schrift = Scale { x: 10.0, y: 10.0 };
         let mut ist_anzahl_guys = ist_anzahl_guys;
         let mut soll_anzahl_guys = soll_anzahl_guys;
         let mut side=side;
@@ -301,10 +309,7 @@ pub fn create_relation (image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,from_person:
         let mut kopf_oben_x = 80;
         let mut kopf_oben_y = 50 - 10;
         let mut side=side;
-        if side=="r" {
-            kopf_oben_x = 920;
-            println!("hdsj");
-        }
+        if side=="r" {kopf_oben_x = 920;}
         kopf_oben_y = kopf_oben_y + (130 * person_von);
         draw_line_segment_mut(&mut image, ((kopf_oben_x) as f32, (kopf_oben_y) as f32), ((kopf_oben_x) as f32, (kopf_oben_y - 30) as f32), draw_color);
         draw_line_segment_mut(&mut image, (kopf_oben_x as f32, (kopf_oben_y - 50) as f32), ((kopf_oben_x - 10) as f32, (kopf_oben_y - 30) as f32), draw_color);
@@ -696,6 +701,10 @@ fn zeiche_pfeil_richtung_zwei(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,
     }
     return(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y)
 }
+
+
+
+
 pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: &Vec<Attribute>,vec_methode: &Vec<Method>)
               ->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){//,i32,i32){//,HashMap<u32, i32>) {
 
@@ -767,8 +776,8 @@ fn zeichne_klasse(nummer: i32,eingabe: &str,image: image::ImageBuffer<Rgb<u8>, V
             if zeile==2 || zeile == 3{
                 ab=ab+65;
             } else {
-                    ab=ab+20;
-                }
+                ab=ab+20;
+            }
             zeile=zeile+1;
             if ab > zweiter_wert {
                 zeile=1;
@@ -813,20 +822,20 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,klass
         draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, "Paket::");
         draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+42, ab+5, ueberschrift, &font, eingabe_ueberschift);
     }else if sichtbarkeit_ueberschrift=="Interface"{
-            let mut ueberschrift = Scale { x: 12.0 , y: 12.0 };
-            let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Oblique.ttf") as &[u8]);
-            let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, ueberschrift, &font, "<<<Interface>>>");
-            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+10, ueberschrift, &font, eingabe_ueberschift);
-        } else if sichtbarkeit_ueberschrift=="Abstrakt"{
-                let mut ueberschrift = Scale { x: 12.0 , y: 12.0 };
-                let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Oblique.ttf") as &[u8]);
-                let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
-                draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, ueberschrift, &font, "<<<Abstract>>>");
-                draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+10, ueberschrift, &font, eingabe_ueberschift);
-            } else if sichtbarkeit_ueberschrift=="Class"{
-                    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, eingabe_ueberschift);
-                }
+        let mut ueberschrift = Scale { x: 12.0 , y: 12.0 };
+        let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Oblique.ttf") as &[u8]);
+        let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, ueberschrift, &font, "<<<Interface>>>");
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+10, ueberschrift, &font, eingabe_ueberschift);
+    } else if sichtbarkeit_ueberschrift=="Abstrakt"{
+        let mut ueberschrift = Scale { x: 12.0 , y: 12.0 };
+        let  font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Oblique.ttf") as &[u8]);
+        let  font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, ueberschrift, &font, "<<<Abstract>>>");
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+10, ueberschrift, &font, eingabe_ueberschift);
+    } else if sichtbarkeit_ueberschrift=="Class"{
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, eingabe_ueberschift);
+    }
     let mut attribute = Scale { x: 8.0, y: 8.0 };
     ab=ab+20;
     while !done_schrift {
@@ -841,31 +850,31 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,klass
                         image.get_pixel_mut(d,ab+8).data=[0,0,0];
                     }
                 } else{
-                        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  vec_attribute[vec_stelle].to_string().as_ref());
-                    }
+                    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  vec_attribute[vec_stelle].to_string().as_ref());
+                }
                 if vec_stelle <= vec_attribute.iter().len()-1{
                     vec_stelle=vec_stelle+1;
                 }
             }
 
         } else if ab>schreiben{
-                if vec_stelle < vec_methode.iter().len(){
-                    vektor_inhalt=vec_methode[vec_stelle].to_string();
-                    if vektor_inhalt.contains("static") {
-                        let v: Vec<&str> = vektor_inhalt.split('/').collect();
-                        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  v[0]);
+            if vec_stelle < vec_methode.iter().len(){
+                vektor_inhalt=vec_methode[vec_stelle].to_string();
+                if vektor_inhalt.contains("static") {
+                    let v: Vec<&str> = vektor_inhalt.split('/').collect();
+                    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  v[0]);
 
-                        for d in erster_wert_x+10..erster_wert_x+130{
-                            image.get_pixel_mut(d,ab+8).data=[0,0,0];
-                        }
-                    } else{
-                            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  vec_methode[vec_stelle].to_string().as_ref());
-                        }
-                    if vec_stelle <= vec_attribute.iter().len(){
-                        vec_stelle=vec_stelle+1;
+                    for d in erster_wert_x+10..erster_wert_x+130{
+                        image.get_pixel_mut(d,ab+8).data=[0,0,0];
                     }
+                } else{
+                    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab, attribute, &font,  vec_methode[vec_stelle].to_string().as_ref());
+                }
+                if vec_stelle <= vec_attribute.iter().len(){
+                    vec_stelle=vec_stelle+1;
                 }
             }
+        }
         if ab==schreiben{
             ab=schreiben+10;
             vec_stelle=0;
@@ -988,18 +997,18 @@ pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::pa
                             ka=ka-1;
                         }
                     } else if ka < mitte_unterseite {
-                            if ka != ende{
-                                ka=ka+1;
-                            }
-                        }
-                } else if s>8{
-                        image.get_pixel_mut(ka,ak).data=[0,0,0];
-                        w=w+1;
-                        if w==10 {
-                            s=0;
-                            w=0;
+                        if ka != ende{
+                            ka=ka+1;
                         }
                     }
+                } else if s>8{
+                    image.get_pixel_mut(ka,ak).data=[0,0,0];
+                    w=w+1;
+                    if w==10 {
+                        s=0;
+                        w=0;
+                    }
+                }
                 s=s+1;
             }
 
@@ -1027,18 +1036,18 @@ pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::pa
                             ka=ka-1;
                         }
                     } else if ka < mitte_unterseite {
-                            if ka != ende{
-                                ka=ka+1;
-                            }
-                        }
-                } else if s>8{
-                        image.get_pixel_mut(ka,ak).data=[0,0,0];
-                        w=w+1;
-                        if w==10 {
-                            s=0;
-                            w=0;
+                        if ka != ende{
+                            ka=ka+1;
                         }
                     }
+                } else if s>8{
+                    image.get_pixel_mut(ka,ak).data=[0,0,0];
+                    w=w+1;
+                    if w==10 {
+                        s=0;
+                        w=0;
+                    }
+                }
                 s=s+1;
             }
         }
@@ -1053,50 +1062,134 @@ pub fn zeichne_pfeil(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::pa
     return(image);
 }
 fn koordinaten(anzahl:i32)->(u32,u32,u32,u32,i32,u32) {
-    let mut erster_wert=30;
-    let mut zweiter_wert=180;
-    let mut erster_wert_x=30;
-    let mut zweiter_wert_x=180;
+
+    let mut erster_wert=0;
+    let mut zweiter_wert=0;
+    let mut erster_wert_x=0;
+    let mut zweiter_wert_x=0;
     let mut mitte_unterseite=0;
-	let mut anzahl=anzahl;
-    let mut ist_anzahl=0;
-    while anzahl==ist_anzahl {
-        if anzahl<5 {
-            erster_wert = 30;
-            zweiter_wert=180;
-        }if anzahl>=5&&anzahl<9 {
-            erster_wert =300 ;
-            zweiter_wert=450;
-        }if anzahl>=9&&anzahl<13 {
-            erster_wert =570;
-            zweiter_wert=720;
-        }if anzahl==13&&anzahl==14||anzahl==15 {
-            erster_wert =840;
-            zweiter_wert=990;
-        }if anzahl==1||anzahl==8||anzahl==9{
-            erster_wert_x=30;
-            zweiter_wert_x=180;
-        }if anzahl==2||anzahl==7||anzahl==10{
-            erster_wert_x=280;
-            zweiter_wert_x=430;
-        }if anzahl==3||anzahl==6||anzahl==11{
-            erster_wert_x=530;
-            zweiter_wert_x=680;
-        }if anzahl==4||anzahl==5||anzahl==12{
-            erster_wert_x=530;
-            zweiter_wert_x=680;
-        }if anzahl == 13{
-            erster_wert_x=630;
-            zweiter_wert_x=930;
-        }if anzahl == 14{
-            erster_wert_x=230;
-            zweiter_wert_x=530;
-        }if anzahl == 15{
-            erster_wert_x=1;
-            zweiter_wert_x=130;
-        }
-        mitte_unterseite=mitte_unterseite+10;
-        ist_anzahl=ist_anzahl+1;
+
+    if anzahl == 1{
+        erster_wert=30;
+        zweiter_wert=180;
+        erster_wert_x=30;
+        zweiter_wert_x=180;
+        mitte_unterseite=0;
+        //eingabe="";
+    }
+
+    if anzahl == 2{
+        erster_wert=30;
+        zweiter_wert=180;
+        erster_wert_x=280;
+        zweiter_wert_x=430;
+        mitte_unterseite=10;
+        //eingabe="";
+    }
+    if anzahl == 3{
+        erster_wert=30;
+        zweiter_wert=180;
+        erster_wert_x=530;
+        zweiter_wert_x=680;
+        mitte_unterseite=20;
+        //eingabe="";
+    }
+    if anzahl == 4{
+        erster_wert=30;
+        zweiter_wert=180;
+        erster_wert_x=780;
+        zweiter_wert_x=930;
+        mitte_unterseite=30;
+        //eingabe="";
+    }
+    if anzahl == 5{
+        erster_wert=300;
+        zweiter_wert=450;
+        erster_wert_x=780;
+        zweiter_wert_x=930;
+        mitte_unterseite=40;
+        //eingabe="";
+    }
+    if anzahl == 6{
+        erster_wert=300;
+        zweiter_wert=450;
+        erster_wert_x=530;
+        zweiter_wert_x=680;
+        mitte_unterseite=50;
+        //eingabe="";
+    }
+
+    if anzahl == 7{
+        erster_wert=300;
+        zweiter_wert=450;
+        erster_wert_x=280;
+        zweiter_wert_x=430;
+        mitte_unterseite=60;
+        //eingabe="";
+    }
+    if anzahl == 8{
+        erster_wert=300;
+        zweiter_wert=450;
+        erster_wert_x=30;
+        zweiter_wert_x=180;
+        mitte_unterseite=70;
+        //eingabe="";
+    }
+    if anzahl == 9{
+        erster_wert=570;
+        zweiter_wert=720;
+        erster_wert_x=30;
+        zweiter_wert_x=180;
+        mitte_unterseite=80;
+        //eingabe="";
+    }
+    if anzahl == 10{
+        erster_wert=570;
+        zweiter_wert=720;
+        erster_wert_x=280;
+        zweiter_wert_x=430;
+        mitte_unterseite=90;
+        //eingabe="";
+    }
+    if anzahl == 11{
+        erster_wert=570;
+        zweiter_wert=720;
+        erster_wert_x=530;
+        zweiter_wert_x=680;
+        mitte_unterseite=100;
+        //eingabe="";
+    }
+    if anzahl == 12{
+        erster_wert=570;
+        zweiter_wert=720;
+        erster_wert_x=780;
+        zweiter_wert_x=930;
+        mitte_unterseite=110;
+        //eingabe="";
+    }
+    if anzahl == 13{
+        erster_wert=840;
+        zweiter_wert=990;
+        erster_wert_x=630;
+        zweiter_wert_x=930;
+        mitte_unterseite=120;
+        //eingabe="";
+    }
+    if anzahl == 14{
+        erster_wert=840;
+        zweiter_wert=990;
+        erster_wert_x=230;
+        zweiter_wert_x=530;
+        mitte_unterseite=130;
+        //eingabe="";
+    }
+    if anzahl == 15{
+        erster_wert=840;
+        zweiter_wert=990;
+        erster_wert_x=1;
+        zweiter_wert_x=130;
+        mitte_unterseite=140;
+        //eingabe="";
     }
     return(erster_wert,zweiter_wert,erster_wert_x,zweiter_wert_x,anzahl,mitte_unterseite);
 }
