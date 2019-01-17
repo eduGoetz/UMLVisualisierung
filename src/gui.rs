@@ -218,15 +218,15 @@ pub fn gui_main() {
         //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
         //label_clone.set_text(errors.as_ref());
 
-        let class_amount = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+        let amount_model = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
 
-        for j in 0..class_amount as u32 {
+        for j in 0..amount_model.class_amount as u32 {
             notebook_clone.borrow_mut().notebook.remove_page(Some(0));
         }
 
         //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
         //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
-        for i in 0..class_amount {
+        for i in 0..amount_model.class_amount {
             notebook_clone.borrow_mut().create_tab(&["ClassDiagramm", &i.to_string()].join(""), ["res/UML_visual_result", ".png"].join(&i.to_string()));
             window_clone.show_all();
         }

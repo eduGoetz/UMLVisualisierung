@@ -92,7 +92,7 @@ fn decode_actors(actors_str: String) -> Vec<Actor> {
             }
 
             actors_return.push(Actor::new(actor_components[0].to_string().parse::<i32>().unwrap(), actor_components[1].to_string(),
-                                          extends_from, actor_use_cases))
+                                          extends_from, actor_use_cases));
         }
     }
     return actors_return;
@@ -108,7 +108,9 @@ pub fn decode_use_cases(use_cases_str: String) -> Vec<UseCase> {
         if use_case_regex.is_match(uc_str.as_ref()) {
             let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
-            use_case_return.push(UseCase::new(use_case_components[0].to_string().parse::<i32>().unwrap(),
+            println!("{}", use_case_components[0]);
+            let num = use_case_components[0].to_string().parse::<i32>().unwrap();
+            use_case_return.push(UseCase::new(num,
                                               use_case_components[1].to_string(), use_case_components[2].to_string() != ""));
         }
     }

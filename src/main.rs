@@ -15,9 +15,12 @@ mod decoder_class;
 mod decoder_usecase;
 mod gui;
 mod visuals;
+mod decoding_to_visual;
 
 fn main() {
 
     //visuals::use_case_hard();
     gui::gui_main();
+
+    let abc = decoder_usecase::decode_use_cases("2:schlafen:EP".to_string());
 }

@@ -7,8 +7,23 @@ use std::path::Path;
 use visuals;
 use decoder_class;
 use decoder_usecase;
+use decoding_to_visual;
 
-pub fn decode_input(given_input: String) -> i32 {
+
+pub struct Model {
+    pub class_amount: i32,
+    pub use_case_amount: i32,
+}
+
+impl Model {
+    fn new (class_amount: i32, use_case_amount: i32) -> Model {
+        Model {class_amount: class_amount, use_case_amount: use_case_amount }
+    }
+}
+
+
+
+pub fn decode_input(given_input: String) -> Model {
     let diagram_regex = Regex::new(r"((Class|UseCase)~.*)").unwrap();
     let input = given_input.to_string();
     let mut class_diagram_list = Vec::new();
@@ -33,56 +48,16 @@ pub fn decode_input(given_input: String) -> i32 {
             }
         }
     }
+    let model = Model::new(class_diagram_list.len() as i32, use_case_diagram_list.len() as i32);
+
     for j in 0..class_diagram_list.len() {
-        call_class_draw(&class_diagram_list[j].classes, &class_diagram_list[j].relations, j as i32)
+        decoding_to_visual::call_class_draw(&class_diagram_list[j].classes, &class_diagram_list[j].relations, j as i32)
     }
 
 
-    for i in &use_case_diagram_list {
-        println!("{:?}", i);
+    for i in 0..use_case_diagram_list.len() {
+        decoding_to_visual::call_use_case_draw(&use_case_diagram_list[i]);
     }
 
-    return class_diagram_list.len() as i32;
-}
-
-fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &Vec<decoder_class::Relation>, class_number: i32) {
-    let path_first_part = "res/UML_visual_result";
-    let path_ending = ".png";
-    let path_str = [path_first_part, path_ending].join(&class_number.to_string());
-    let path = Path::new(&path_str);
-
-    let mut image = visuals::erstelle_image();
-    for i in class_list {
-        let mut klassentyp = "";
-        if let decoder_class::ClassType::Class = i.class_type {
-            klassentyp = "Class";
-        } else if let decoder_class::ClassType::Abstract = i.class_type {
-            klassentyp = "Abstract";
-        } else {
-            klassentyp = "Interface";
-        }
-
-        image = visuals::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
-    }
-
-    for j in relation_list {
-        let mut pfeiltyp = "";
-        if let decoder_class::RelationType::Vererbung = j.relation_type {
-            pfeiltyp = "ver";
-        } else if let decoder_class::RelationType::Aggregation = j.relation_type {
-            pfeiltyp = "agg";
-        } else if let decoder_class::RelationType::Komposition = j.relation_type {
-            pfeiltyp = "kompo";
-        } else if let decoder_class::RelationType::Assoziation = j.relation_type {
-            pfeiltyp = "asso";
-        } else if let decoder_class::RelationType::GerAssoziation = j.relation_type {
-            pfeiltyp = "ge_asso";
-        } else if let decoder_class::RelationType::Implementierung = j.relation_type {
-            pfeiltyp = "imple";
-        } else {
-            pfeiltyp = "abh";
-        }
-
-        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
-    }
+    return model;
 }
