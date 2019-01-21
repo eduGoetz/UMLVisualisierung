@@ -22,7 +22,6 @@ impl Model {
 }
 
 
-
 pub fn decode_input(given_input: String) -> Model {
     let diagram_regex = Regex::new(r"((Class|UseCase)~.*)").unwrap();
     let input = given_input.to_string();
