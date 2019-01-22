@@ -90,89 +90,82 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 }
 
 pub fn main() {
-
-//ein ekteur pro push und einzelne sachen mit ; getrennt
-    //wo akteur erstellen,welche seite,name des aktuers,beziehung (true or false),beziehung nach
-    /*let mut vec_akteure = Vec::new();
-    vec_akteure.push("5;r;name;true;4");
-    vec_akteure.push("4;r;test;false");
-    vec_akteure.push("1;l;namdddse;false");
-
-    //stelle case,art case,bei asso nach,bei asso welche seite,extend,von extend,include,von include,nach include
-    let mut vec_cases = Vec::new();
-    vec_cases.push("1;normal;5;r;false;0;true;2");
-    vec_cases.push("2;asso;5;r;false;0;false;0;1;1");
-    vec_cases.push("5;asso;5;r;false;0;false;0;1;ka");
-    vec_cases.push("8;asso;5;r;false;0;false;0;1;test");
-    vec_cases.push("11;asso;5;r;false;0;false;0;1;hallo");
-    vec_cases.push("3;extend;5;r;true;2;false;0");
-
-    let mut image=erstelle_image();
-    image=create_system_and_akteur(image,"Test",vec_akteure);
-    image=create_cases(image,vec_cases);*/
-
 }
 pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: &Vec<Actor>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
     let mut systemname=systemname;
-    let mut vec_akteure=vec_akteure;
     let mut done_create=false;
-    //let mut vektor_inhalt;
     let mut vec_stelle=0;
-
+    let mut anzahl=0;
     image=draw_systemborder(image,systemname);
+
     while !done_create {
-        //vektor_inhalt=vec_akteure[vec_stelle].to_string();
-        //let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
         let mut position = vec_akteure[vec_stelle].id;
         image = draw_akteur(image, 0, position,"l");//0 muss da bleiben
         image = name_akteur(image, position, &vec_akteure[vec_stelle].name,"l");
         let mut relation =  vec_akteure[vec_stelle].extends_from;
         match relation {
-            Some(relation) => image = draw_relationship_akteur(image, position, relation,"l"),
-            None => continue,
-        }
+            Some(relation) => image = draw_relationship_akteur(image, position,relation, "l"),
+            None => (),
+        }//UseCase~Name;1:Akteur::1,;1:schlafen:EP,2:laufen:;extends:2->1,include:1->2
         vec_stelle=vec_stelle+1;
+        let mut vektor_inhalt=&vec_akteure[vec_stelle-1].has_use_case.len();
+        anzahl=*vektor_inhalt;
+        for x in 0..anzahl {
+            let mut rel = &vec_akteure[x].has_use_case;
+            image=draw_case_with_assoziation(image,rel[x],position,"","","l");
+        }
         if vec_stelle==vec_akteure.iter().len(){
+            done_create=true;
+        }
+    }
+
+    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    return(image);
+}
+pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<UseCase>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+    let mut image=image;
+    let mut done_create=false;
+    let mut vec_stelle=0;
+    let mut name="";
+
+    while !done_create {
+        let mut place = vec_cases[vec_stelle].id;
+        let mut extend = vec_cases[vec_stelle].is_extension_point;
+        name= &vec_cases[vec_stelle].name;
+
+        if extend==true{
+            image=draw_case_extend(image,place)
+        }
+        image = draw_case(image, place);
+        image=name_case(image,place,name);
+
+        vec_stelle=vec_stelle+1;
+        if vec_stelle==vec_cases.iter().len(){
             done_create=true;
         }
     }
     let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
     return(image);
 }
-pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<UseCase>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_relations(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<UseCaseRelation>)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
     let mut image=image;
-    //let mut vec_cases=vec_cases;
     let mut done_create=false;
-    //let mut vektor_inhalt="".to_string();
     let mut vec_stelle=0;
 
-    while !done_create {
-        //vektor_inhalt=vec_cases[vec_stelle].to_string();
-        //let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
-        let mut place = vec_cases[vec_stelle].id;
-        let mut extend = vec_cases[vec_stelle].is_extension_point;
-        //if v[1]=="normal" {
-            image = draw_case(image, place);
-        /*}else if v[1]=="asso" {
-            let mut person = v[2].parse::<i32>().unwrap();
-            image = draw_case_with_assoziation(image, place, person, v[8], v[9], v[3]);
-        }else if v[1]=="extend" {
-            image = draw_case_extend(image, place);
-        }*/
-        /*let mut include = v[6].parse::<bool>().unwrap();
-        if extend==true {
-            let mut from_case = v[5].parse::<i32>().unwrap();
-            image = draw_arrow(image, from_case, place, "'Extend'");
+    println!("{:?}", vec);
+    for rel in vec{
+        println!("FDFdf");
+        if let UseCaseRelationType::Include = rel.relation_type {
+            println!("{},{}", rel.from, rel.to);
+            image=draw_arrow(image,rel.from,rel.to,"<<include>>");
         }
-            else if include==true{
-                let mut to_case = v[7].parse::<i32>().unwrap();
-                image = draw_arrow(image, place, to_case, "'Include'");
-            }*/
-        vec_stelle=vec_stelle+1;
-        if vec_stelle==vec_cases.iter().len(){
-            done_create=true;
+        else{
+            image=draw_arrow(image,rel.from,rel.to,"<<extend>>");
         }
+        //von ist von welchem case aus gezeichnet wird  (i32)
+        //nach ist zu welchem case gezeichnet wird      (i32)
+        //beschriftung ist ob include oder extend       (&str)
     }
     let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
     return(image);

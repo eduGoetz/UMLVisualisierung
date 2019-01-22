@@ -9,3 +9,8 @@ Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=n
 UseCase~Systemname;1:Akteur::1 2 3 4,;1:Feier auflösen:extendion point,;extends:1->2,include:2->1
 
 UseCase~Name;1:Akteur:1:1,;2:schlafen:EP,;extends:1->2,include:2->1
+
+UseCase~Name;
+1:Akteur::1,2:Lorenzo:1:2;
+1:schlafen:EP,2:laufen:,3:essen:;
+extends:2->1,include:2->3

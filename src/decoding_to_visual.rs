@@ -55,6 +55,6 @@ pub fn call_use_case_draw(use_case_diagram: &decoder_usecase::UseCaseDiagramm) {
 
     image = visuals::create_system_and_akteur(image.clone(), &use_case_diagram.name, &use_case_diagram.actors);
     image = visuals::create_cases(image.clone(), &use_case_diagram.use_cases);
-
+    image = visuals::create_relations(image.clone(), &use_case_diagram.use_case_realtions);
 
 }

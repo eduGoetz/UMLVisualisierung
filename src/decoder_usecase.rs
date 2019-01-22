@@ -119,7 +119,7 @@ pub fn decode_use_cases(use_cases_str: String) -> Vec<UseCase> {
 
 
 fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRelation> {
-    let relation_use_case_regex = Regex::new(r"((E|I):\d+->\d+)").unwrap();
+    let relation_use_case_regex = Regex::new(r"((Extends|Include):\d+->\d+)").unwrap();
     let mut relation_uc_return = Vec::new();
 
     let use_cases_realtions_strings = use_cases_relations_str.split(",");
@@ -129,8 +129,8 @@ fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRela
 
             let mut relation_type_uc: UseCaseRelationType;
             match relation_uc_components[0].as_ref() {
-                "E" => relation_type_uc = UseCaseRelationType::Extends,
-                "I" => relation_type_uc = UseCaseRelationType::Include,
+                "Extends" => relation_type_uc = UseCaseRelationType::Extends,
+                "Include" => relation_type_uc = UseCaseRelationType::Include,
                 _ => continue,
             }
 
