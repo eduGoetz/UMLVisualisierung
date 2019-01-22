@@ -148,21 +148,17 @@ pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<
     let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
     return(image);
 }
-pub fn create_relations(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+pub fn create_relations(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<UseCaseRelation>)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
     let mut image=image;
     let mut done_create=false;
     let mut vec_stelle=0;
-
-    while !done_create {
-        //von ist von welchem case aus gezeichnet wird  (i32)
-        //nach ist zu welchem case gezeichnet wird      (i32)
-        //beschriftung ist ob include oder extend       (&str)
-        image=draw_arrow(image,von,nach,beschriftung);
-
-        vec_stelle=vec_stelle+1;
-        if vec_stelle==vec_akteure.iter().len(){
-            done_create=true;
+    for rel in vec{
+        if let UseCaseRelationType::Include = rel.relation_type {
+            image=draw_arrow(image,rel.from,rel.to,"<<include>>");
         }
+            else{
+                image=draw_arrow(image,rel.from,rel.to,"<<extend>>");
+            }
     }
     let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
     return(image);
