@@ -99,7 +99,7 @@ pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,syst
     let mut anzahl=0;
     image=draw_systemborder(image,systemname);
 
-    while !done_create {
+    for vec_stelle in 0..vec_akteure.len(){
         let mut position = vec_akteure[vec_stelle].id;
         image = draw_akteur(image, 0, position,"l");//0 muss da bleiben
         image = name_akteur(image, position, &vec_akteure[vec_stelle].name,"l");
@@ -108,15 +108,8 @@ pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,syst
             Some(relation) => image = draw_relationship_akteur(image, position,relation, "l"),
             None => (),
         }//UseCase~Name;1:Akteur::1,;1:schlafen:EP,2:laufen:;extends:2->1,include:1->2
-        vec_stelle=vec_stelle+1;
-        let mut vektor_inhalt=&vec_akteure[vec_stelle-1].has_use_case.len();
-        anzahl=*vektor_inhalt;
-        for x in 0..anzahl {
-            let mut rel = &vec_akteure[x].has_use_case;
-            image=draw_case_with_assoziation(image,rel[x],position,"","","l");
-        }
-        if vec_stelle==vec_akteure.iter().len(){
-            done_create=true;
+        for id in &vec_akteure[vec_stelle].has_use_case{
+            image=draw_case_with_assoziation(image,*id,position,"","","l");
         }
     }
 
