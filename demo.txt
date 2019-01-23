@@ -1,4 +1,4 @@
-Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+﻿Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
 
 ---
 
@@ -17,10 +17,10 @@ UseCase~Einweihungsfeier;
 16:Gäste hinausbegleiten:,
 20:Feier abrupt beenden:;
 
-Extends:12->6,
-Extends:12->8,
-Include:14->16,
-Include:20->16
+Extends:12->6:condition {Kühlschrank leer},
+Extends:12->8:condition {Kühlschrank leer},
+Include:14->16:,
+Include:20->16:
 
 ---
 
@@ -39,7 +39,7 @@ UseCase~Einweihungsfeier;
 7:Gäste hinausbegleiten:,
 8:Feier abrupt beenden:;
 
-Extends:5->2,
-Extends:5->4,
-Include:8->7,
-Include:6->7
+Extends:5->2:,
+Extends:5->4:,
+Include:8->7:,
+Include:6->7:

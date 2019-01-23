@@ -212,7 +212,7 @@ pub enum RelationType {
 
 
 fn decode_classes(classes_str: String) -> (Vec<Class>, String) {
-    let classes_regex = Regex::new(r"(\d+;((Class)|(Interface)|(Abstract));(\w+);(.*);(.*)(/?))+").unwrap();
+    let classes_regex = Regex::new(r"^(\d+;((Class)|(Interface)|(Abstract));(\w+);(.*);(.*)(/?))+$").unwrap();
 
     let mut errors = "".to_string();
     let mut class_list_return = Vec::new();
@@ -239,6 +239,7 @@ fn decode_classes(classes_str: String) -> (Vec<Class>, String) {
                                               class_components_vec[2].to_string(), decode_attributes(class_components_vec[3].to_string()).0,
                                               decode_methods(class_components_vec[4].to_string()).0));
         } else {
+            println!("fdfd");
             if (cla_str != "") {
                 errors = [errors, "Das Klassenlayout ist falsch, mind. 1 Klasse übersprungen.\n".to_string()].join("");
             }
@@ -249,7 +250,7 @@ fn decode_classes(classes_str: String) -> (Vec<Class>, String) {
 
 
 fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String) {
-    let attribute_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+)(,?))*").unwrap();
+    let attribute_regex = Regex::new(r"^((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+)(,?))*$").unwrap();
     let mut errors = "".to_string();
     let mut class_attributes_return = Vec::new();
 
@@ -266,7 +267,7 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String) {
                 "package" => attribute_access_modifier = AccessModifier::Package,
                 "" => attribute_access_modifier = AccessModifier::Default,
                 _ => {
-                    errors = [errors, "Der Zugriffsmodifikator in einem Attribut ist falsch, mind, ein Attribut übersprungen.\n".to_string()].join("");
+                    errors = [errors, "Der Zugriffsmodifikator in einem Attribut ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
                     continue;
                 }
             }
@@ -278,8 +279,6 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String) {
             } else {
                 if attribute_components.is_empty() {
                     errors = [errors, "Das Attributlayout ist falsch, mind. ein Attribut übersprungen.\n".to_string()].join("");
-                } else {
-                    errors = [errors, "WARNUNG: Attributfelder wurden leer gelassen.\n".to_string()].join("");
                 }
             }
         } else {
@@ -291,7 +290,7 @@ fn decode_attributes(attributes_str: String) -> (Vec<Attribute>, String) {
 
 
 fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
-    let method_regex = Regex::new(r"((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+):(.*)?(,?))*").unwrap();
+    let method_regex = Regex::new(r"^((public|private|protected|package)?:(static)?:(final)?:(\w+):(\w+):(.*)?(,?))*$").unwrap();
     let mut errors = "".to_string();
 
     let mut class_methods_return = Vec::new();
@@ -299,9 +298,9 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
     let method_strings = methods_str.split(",");
     for met_str in method_strings {
         if met_str == "" {
-            errors = [errors, "WARNUNG: Methodenfelder wurden leer gelassen.\n".to_string()].join("");
             continue;
         }
+        println!("{}   {}",method_regex, met_str);
         if method_regex.is_match(met_str.as_ref()) {
             let method_components: Vec<String> = met_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
@@ -313,7 +312,7 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
                 "package" => method_access_modifier = AccessModifier::Package,
                 "" => method_access_modifier = AccessModifier::Default,
                 _ => {
-                    errors = [errors, "Der Zugriffsmodifikator in einer Methode ist falsch, mind, eine Methode übersprungen.\n".to_string()].join("");
+                    errors = [errors, "Der Zugriffsmodifikator in einer Methode ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
                     continue;
                 }
             }
@@ -327,8 +326,6 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
             } else {
                 if method_components.is_empty() {
                     errors = [errors, "Das Methodenlayout ist falsch, mind. eine Methode übersprungen.\n".to_string()].join("");
-                } else {
-                    errors = [errors, "WARNUNG: Methodenfelder wurden leer gelassen.\n".to_string()].join("");
                 }
             }
         } else {
@@ -340,7 +337,7 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
 
 
 fn decode_parameters(param_str: String) -> (Vec<Parameter>, String) {
-    let param_regex = Regex::new(r"((w+)=(w+)( )?)*").unwrap();
+    let param_regex = Regex::new(r"^((\w+)=(\w+)( )?)*$").unwrap();
     let mut errors = "".to_string();
     let mut class_methods_param_return = Vec::new();
 
@@ -354,8 +351,6 @@ fn decode_parameters(param_str: String) -> (Vec<Parameter>, String) {
             } else {
                 if single_params.is_empty() {
                     errors = [errors, "Das Parameterlayout ist falsch, mind. ein Parameter übersprungen.\n".to_string()].join("");
-                } else {
-                    errors = [errors, "WARNUNG: Parameterfelder wurden leer gelassen.\n".to_string()].join("");
                 }
             }
         } else {
@@ -366,8 +361,9 @@ fn decode_parameters(param_str: String) -> (Vec<Parameter>, String) {
 }
 
 
-fn decode_relations(relations_str: String) -> Vec<Relation> {
-    let relation_regex = Regex::new(r"((V|A|gA|AG|K|I|AB);\d+->\d+;((\d+|\w+|\*):(\d+|\w+|\*))?(,)?)*").unwrap();
+fn decode_relations(relations_str: String) -> (Vec<Relation>, String) {
+    let relation_regex = Regex::new(r"^((V|A|gA|AG|K|I|AB);\d+->\d+;((\d+|\w+|\*):(\d+|\w+|\*))?(,)?)*$").unwrap();
+    let mut errors = "".to_string();
     let mut relations_return = Vec::new();
 
     let relation_strings = relations_str.split(",");
@@ -384,7 +380,10 @@ fn decode_relations(relations_str: String) -> Vec<Relation> {
                 "K" => relation_type = RelationType::Komposition,
                 "I" => relation_type = RelationType::Implementierung,
                 "AB" => relation_type = RelationType::Ableitung,
-                _ => continue,
+                _ => {
+                    errors = [errors, "Der Zugriffsmodifikator in einer Klassenbeziehung ist falsch, mind. eine Klassenbeziehung übersprungen.\n".to_string()].join("");
+                    continue;
+                }
             }
 
             let mut from_to_vec: Vec<i32> = Vec::new();
@@ -404,14 +403,17 @@ fn decode_relations(relations_str: String) -> Vec<Relation> {
 
             relations_return.push(Relation::new(relation_type, from_to_vec[0], from_to_vec[1],
                                                 multi_from_to_vec[0].to_string(), multi_from_to_vec[1].to_string()));
+        } else {
+            errors = [errors, "Das Klassenrelationslayout ist falsch, mind. eine Klassenbeziehung übersprungen.\n".to_string()].join("");
         }
     }
-    return relations_return;
+    return (relations_return, errors);
 }
 
 
-pub fn decode_class_diagram(given_input: String) -> Option<ClassDiagram> {
-    let input_regex = Regex::new(r"(.*\|.*)?").unwrap();
+pub fn decode_class_diagram(given_input: String) -> (Option<ClassDiagram>, String) {
+    println!("{}", given_input);
+    let input_regex = Regex::new(r"^(.*\|.*)?$").unwrap();
     let input = given_input.to_string();
     let mut class_list = Vec::new();
     let mut errors = "".to_string();
@@ -423,10 +425,13 @@ pub fn decode_class_diagram(given_input: String) -> Option<ClassDiagram> {
         errors = decode_classes(class_relation_vec[0].to_string()).1;
 
         if class_relation_vec.len() > 1 {
-            relation_list = decode_relations(class_relation_vec[1].to_string());
+            let decoded_relations_result = decode_relations(class_relation_vec[1].to_string());
+            relation_list = decoded_relations_result.0;
+            errors = [errors,decoded_relations_result.1].join("");
         }
 
-        return Some(ClassDiagram::new(class_list, relation_list));
+        return (Some(ClassDiagram::new(class_list, relation_list)), errors);
     }
-    return None;
+
+    return (None,"".to_string());
 }

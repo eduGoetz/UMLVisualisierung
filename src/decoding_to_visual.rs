@@ -5,6 +5,8 @@ use decoder;
 use decoder_class;
 use decoder_usecase;
 use visuals;
+use visuals_class;
+use visuals_case;
 
 
 pub fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &Vec<decoder_class::Relation>, class_number: i32) {
@@ -24,7 +26,7 @@ pub fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &V
             klassentyp = "Interface";
         }
 
-        image = visuals::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
+        image = visuals_class::klasse(i.name.as_ref(), klassentyp, image.clone(), path, i.class_id, &i.attributes, &i.methods);
     }
 
     for j in relation_list {
@@ -45,7 +47,7 @@ pub fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &V
             pfeiltyp = "abh";
         }
 
-        image = visuals::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
+        image = visuals_class::zeichne_pfeil(image.clone(), path, pfeiltyp, j.from, j.to, &j.from_multiplicity, &j.to_multiplicity);
     }
 }
 
@@ -57,7 +59,7 @@ pub fn call_use_case_draw(use_case_diagram: &decoder_usecase::UseCaseDiagramm, u
     let path_str = [path_first_part, path_ending].join(&use_case_number.to_string());
     let path = Path::new(&path_str);
 
-    image = visuals::create_system_and_akteur(path, image.clone(), &use_case_diagram.name, &use_case_diagram.actors);
-    image = visuals::create_cases(path, image.clone(), &use_case_diagram.use_cases);
-    image = visuals::create_relations(path, image.clone(), &use_case_diagram.use_case_realtions);
+    image = visuals_case::create_system_and_akteur(path, image.clone(), &use_case_diagram.name, &use_case_diagram.actors);
+    image = visuals_case::create_cases(path, image.clone(), &use_case_diagram.use_cases);
+    image = visuals_case::create_relations(path, image.clone(), &use_case_diagram.use_case_realtions);
 }

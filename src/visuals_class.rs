@@ -25,7 +25,8 @@ use std::ops::Mul;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 use image::GenericImageView;
-use visuals::*;
+use visuals::draw_text_mut;
+
 
 pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: &Vec<Attribute>,vec_methode: &Vec<Method>)
               ->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){//,i32,i32){//,HashMap<u32, i32>) {

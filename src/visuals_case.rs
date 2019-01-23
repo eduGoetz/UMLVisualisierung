@@ -25,80 +25,87 @@ use std::ops::Mul;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 use image::GenericImageView;
-use visuals::*;
+use visuals::draw_text_mut;
 
-
-pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: Vec<&str>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_system_and_akteur(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: &Vec<Actor>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
     let mut systemname=systemname;
-    let mut vec_akteure=vec_akteure;
     let mut done_create=false;
-    let mut vektor_inhalt="".to_string();
     let mut vec_stelle=0;
-
+    let mut anzahl=0;
     image=draw_systemborder(image,systemname);
-    while !done_create {
-        vektor_inhalt=vec_akteure[vec_stelle].to_string();
-        let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
-        let mut position = v[0].parse::<i32>().unwrap();
-        image = draw_akteur(image, 0, position,v[1]);//0 muss da bleiben
-        image = name_akteur(image, position, v[2],v[1]);
-        let mut relation = v[3].parse::<bool>().unwrap();
-        if relation==true {
-            let mut to_position = v[4].parse::<i32>().unwrap();
-            image = draw_relationship_akteur(image, position, to_position,v[1]);
+
+    for vec_stelle in 0..vec_akteure.len(){
+        let mut position = vec_akteure[vec_stelle].id;
+        image = draw_akteur(image, 0, position,"l");//0 muss da bleiben
+        image = name_akteur(image, position, &vec_akteure[vec_stelle].name,"l");
+        let mut relation =  vec_akteure[vec_stelle].extends_from;
+        match relation {
+            Some(relation) => image = draw_relationship_akteur(image, position,relation, "l"),
+            None => (),
         }
-        vec_stelle=vec_stelle+1;
-        if vec_stelle==vec_akteure.iter().len(){
-            done_create=true;
+        for id in &vec_akteure[vec_stelle].has_use_case{
+            image=draw_case_with_assoziation(image,*id,position,"","","l");
         }
     }
-    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+
+    let _ = image.save(path).unwrap();
     return(image);
 }
-pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: Vec<&str>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_cases(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<UseCase>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
-    let mut vec_cases=vec_cases;
     let mut done_create=false;
-    let mut vektor_inhalt="".to_string();
     let mut vec_stelle=0;
+    let mut name="";
 
     while !done_create {
-        vektor_inhalt=vec_cases[vec_stelle].to_string();
-        let mut v: Vec<&str> = vektor_inhalt.split(';').collect();
-        let mut place = v[0].parse::<i32>().unwrap();
-        let mut extend = v[4].parse::<bool>().unwrap();
-        if v[1]=="normal" {
-            image = draw_case(image, place);
-        }else if v[1]=="asso" {
-            let mut person = v[2].parse::<i32>().unwrap();
-            image = draw_case_with_assoziation(image, place, person, v[8], v[9], v[3]);
-        }else if v[1]=="extend" {
-            image = draw_case_extend(image, place);
+        let mut place = vec_cases[vec_stelle].id;
+        let mut extend = vec_cases[vec_stelle].is_extension_point;
+        name= &vec_cases[vec_stelle].name;
+
+        if extend==true{
+            image=draw_case_extend(image,place)
         }
-        let mut include = v[6].parse::<bool>().unwrap();
-        if extend==true {
-            let mut from_case = v[5].parse::<i32>().unwrap();
-            image = draw_arrow(image, from_case, place, "'Extend'");
-        }
-            else if include==true{
-                let mut to_case = v[7].parse::<i32>().unwrap();
-                image = draw_arrow(image, place, to_case, "'Include'");
-            }
+        image = draw_case(image, place);
+        image=name_case(image,place,name);
+
         vec_stelle=vec_stelle+1;
         if vec_stelle==vec_cases.iter().len(){
             done_create=true;
         }
     }
-    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    let _ = image.save(path).unwrap();
     return(image);
+}
+pub fn create_relations(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<UseCaseRelation>)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+    let mut image=image;
+    let mut done_create=false;
+    let mut vec_stelle=0;
+    let mut anzahl=0;
+    let mut tuple=draw_arrow(image,0,0,"");
+    let mut vor_x=tuple.1;
+    let mut vor_y=tuple.2;
+    for rel in vec{
+        if let UseCaseRelationType::Include = rel.relation_type {
+            tuple=draw_arrow(tuple.0,rel.from,rel.to,"<<include>>");
+        }
+            else{
+                tuple=draw_arrow(tuple.0,rel.from,rel.to,"<<extend>>");
+                anzahl=anzahl+1;
+                image=tuple.0;
+                image = draw_extend_reason(image, anzahl, &rel.note, tuple.1, tuple.2);
+                tuple.0 = image;
+            }
+    }
+    let _ = tuple.0.save(path).unwrap();
+    return(tuple.0);
 }
 fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Bold.ttf") as &[u8]);
     let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
     let schrift = Scale { x: 20.0, y: 20.0 };
     let draw_color = Rgb([0u8, 0u8, 0u8]);
-    let rect = Rect::at(200, 10).of_size(600, 990);
+    let rect = Rect::at(200, 10).of_size(780,990);
     let mut image = image;
     let mut name = name;
     draw_hollow_rect_mut(&mut image, rect, draw_color);
@@ -275,7 +282,7 @@ fn get_case_koordinaten(ende: i32) -> (i32,i32,i32,i32) {
         }
     return (x_ellipse,y_ellipse,spalte,reihe);
 }
-fn draw_arrow(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, von: i32,nach: i32,beschriftung: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+fn draw_arrow(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, von: i32,nach: i32,beschriftung: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>,i32,i32) {
     let draw_color = Rgb([0u8, 0u8, 0u8]);
     let draw_white = Rgb([255u8, 255u8, 255u8]);
     let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
@@ -283,159 +290,186 @@ fn draw_arrow(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, von: i32,nach: i32,be
     let schrift = Scale { x: 13.0, y: 13.0 };
     let mut beschriftung=beschriftung;
     let mut image=image;
-    let mut von=get_case_koordinaten(von);
-    let mut nach=get_case_koordinaten(nach);
-    let mut start_x=von.0;
-    let mut ende_x=nach.0;
-    let mut start_y=von.1;
-    let mut ende_y=nach.1;
-    let mut spalte_von=von.2;
-    let mut spalte_nach=nach.2;
-    let mut reihe_von=von.3;
-    let mut reihe_nach=nach.3;
-    let mut dazu=10;
-    let mut dazu_y=10;
-    let mut anderes=10;
-    let mut richtung_h="";
-    let mut richtung_w="";
-    let mut richtung_pfeil="";
-    if reihe_von==reihe_nach && spalte_von<=spalte_nach{
-        start_x=start_x+50;
-        ende_x=ende_x-50;
-        dazu=10;
-        richtung_pfeil="rechts";
-    } else if reihe_von==reihe_nach && spalte_von>=spalte_nach{
-        start_x=start_x-50;
-        ende_x=ende_x+50;
-        dazu=-10;
-        richtung_pfeil="links";
-    } else if spalte_von==spalte_nach && reihe_von<=reihe_nach{
-        start_y=start_y+25;
-        ende_y=ende_y-25;
-        dazu=10;
-        richtung_pfeil="unten";
-    } else if spalte_von==spalte_nach && reihe_von>=reihe_nach{
-        start_y=start_y-25;
-        ende_y=ende_y+25;
-        dazu=-10;
-        richtung_pfeil="oben";
-    } else if spalte_von < spalte_nach && reihe_von <reihe_nach{
-        start_x=start_x+50;
-        ende_x=ende_x-50;
-        dazu=10;
-        dazu_y=10;
-        anderes=-10;
-        richtung_h="unten";
-        richtung_w="rechts";
-        richtung_pfeil="rechts";
-    } else if spalte_von < spalte_nach && reihe_von >reihe_nach{
-        start_x=start_x+50;
-        ende_x=ende_x-50;
-        dazu=10;
-        dazu_y=-10;
-        anderes=10;
-        richtung_h="oben";
-        richtung_w="rechts";
-        richtung_pfeil="rechts";
-    } else if spalte_von > spalte_nach && reihe_von < reihe_nach{
-        start_x=start_x-50;
-        ende_x=ende_x+50;
-        dazu=10;
-        dazu_y=10;
-        anderes=-10;
-        richtung_h="unten";
-        richtung_w="links";
-        richtung_pfeil="links";
-    } else if spalte_von > spalte_nach && reihe_von > reihe_nach{
-        start_x=start_x-50;
-        ende_x=ende_x+50;
-        dazu=10;
-        dazu_y=-10;
-        anderes=10;
-        richtung_h="oben";
-        richtung_w="links";
-        richtung_pfeil="links";
-    }
-    let mut zwischen_x=start_x;
-    let mut zwischen_y=start_y;
-    let mut fertig=false;
-    while fertig==false {
-        draw_line_segment_mut(&mut image, ((start_x) as f32, (start_y) as f32), ((zwischen_x) as f32, (zwischen_y) as f32), draw_color);
-        if start_y==ende_y{
-            start_x=zwischen_x;
-            zwischen_x=zwischen_x+dazu;
-            if spalte_von>spalte_nach{
-                if zwischen_x <= ende_x {
-                    fertig = true;
-                }
-            }else {
-                if zwischen_x >= ende_x {
-                    fertig = true;
-                }
-            }
-            start_x=zwischen_x;
-            zwischen_x=zwischen_x+dazu;
+    let mut von_k=von;
+    let mut nach_k=nach;
+    let mut kreis_x=0;
+    let mut kreis_y=0;
+    if von_k >0 && nach_k > 0 {
+        let mut von = get_case_koordinaten(von);
+        let mut nach = get_case_koordinaten(nach);
+        let mut start_x = von.0;
+        let mut ende_x = nach.0;
+        let mut start_y = von.1;
+        let mut ende_y = nach.1;
+        let mut spalte_von = von.2;
+        let mut spalte_nach = nach.2;
+        let mut reihe_von = von.3;
+        let mut reihe_nach = nach.3;
+        let mut dazu = 10;
+        let mut dazu_y = 10;
+        let mut anderes = 10;
+        let mut richtung_h = "";
+        let mut richtung_w = "";
+        let mut richtung_pfeil = "";
+        if reihe_von == reihe_nach && spalte_von <= spalte_nach {
+            start_x = start_x + 50;
+            ende_x = ende_x - 50;
+            dazu = 10;
+            kreis_x = ende_x - 30;
+            kreis_y = ende_y;
+            richtung_pfeil = "rechts";
+        } else if reihe_von == reihe_nach && spalte_von >= spalte_nach {
+            start_x = start_x - 50;
+            ende_x = ende_x + 50;
+            dazu = -10;
+            kreis_x = ende_x + 30;
+            kreis_y = ende_y;
+            richtung_pfeil = "links";
+        } else if spalte_von == spalte_nach && reihe_von <= reihe_nach {
+            start_y = start_y + 25;
+            ende_y = ende_y - 25;
+            dazu = 10;
+            kreis_x = ende_x;
+            kreis_y = ende_y - 30;
+            richtung_pfeil = "unten";
+        } else if spalte_von == spalte_nach && reihe_von >= reihe_nach {
+            start_y = start_y - 25;
+            ende_y = ende_y + 25;
+            dazu = -10;
+            kreis_x = ende_x;
+            kreis_y = ende_y + 30;
+            richtung_pfeil = "oben";
+        } else if spalte_von < spalte_nach && reihe_von < reihe_nach {
+            start_x = start_x + 50;
+            ende_x = ende_x - 50;
+            dazu = 10;
+            dazu_y = 10;
+            anderes = -10;
+            kreis_x = ende_x - 30;
+            kreis_y = ende_y - 10;
+            richtung_h = "unten";
+            richtung_w = "rechts";
+            richtung_pfeil = "rechts";
+        } else if spalte_von < spalte_nach && reihe_von > reihe_nach {
+            start_x = start_x + 50;
+            ende_x = ende_x - 50;
+            dazu = 10;
+            dazu_y = -10;
+            anderes = 10;
+            kreis_x = ende_x - 30;
+            kreis_y = ende_y + 10;
+            richtung_h = "oben";
+            richtung_w = "rechts";
+            richtung_pfeil = "rechts";
+        } else if spalte_von > spalte_nach && reihe_von < reihe_nach {
+            start_x = start_x - 50;
+            ende_x = ende_x + 50;
+            dazu = 10;
+            dazu_y = 10;
+            anderes = -10;
+            kreis_x = ende_x + 30;
+            kreis_y = ende_y - 10;
+            richtung_h = "unten";
+            richtung_w = "links";
+            richtung_pfeil = "links";
+        } else if spalte_von > spalte_nach && reihe_von > reihe_nach {
+            start_x = start_x - 50;
+            ende_x = ende_x + 50;
+            dazu = 10;
+            dazu_y = -10;
+            anderes = 10;
+            kreis_x = ende_x + 30;
+            kreis_y = ende_y + 10;
+            richtung_h = "oben";
+            richtung_w = "links";
+            richtung_pfeil = "links";
         }
-            else if start_x==ende_x{
-                start_y=zwischen_y;
-                zwischen_y=zwischen_y+dazu;
-                if reihe_von>reihe_nach{
+        let mut zwischen_x = start_x;
+        let mut zwischen_y = start_y;
+        let mut fertig = false;
+        while fertig == false {
+            draw_line_segment_mut(&mut image, ((start_x) as f32, (start_y) as f32), ((zwischen_x) as f32, (zwischen_y) as f32), draw_color);
+            if start_y == ende_y {
+                start_x = zwischen_x;
+                zwischen_x = zwischen_x + dazu;
+                if spalte_von > spalte_nach {
+                    if zwischen_x <= ende_x {
+                        fertig = true;
+                    }
+                } else {
+                    if zwischen_x >= ende_x {
+                        fertig = true;
+                    }
+                }
+                start_x = zwischen_x;
+                zwischen_x = zwischen_x + dazu;
+            } else if start_x == ende_x {
+                start_y = zwischen_y;
+                zwischen_y = zwischen_y + dazu;
+                if reihe_von > reihe_nach {
                     if zwischen_y <= ende_y {
                         fertig = true;
                     }
-                }else {
+                } else {
                     if zwischen_y >= ende_y {
                         fertig = true;
                     }
                 }
-                start_y=zwischen_y;
-                zwischen_y=zwischen_y+dazu;
-            }
-                else{
-                    let mut tuple=zeiche_pfeil_richtung_eins(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y,dazu,dazu_y,richtung_h,richtung_w);
-                    start_x=tuple.0;
-                    start_y=tuple.1;
-                    ende_x=tuple.2;
-                    ende_y=tuple.3;
-                    zwischen_x=tuple.4;
-                    zwischen_y=tuple.5;
-                    if zwischen_y >= ende_y && richtung_pfeil=="rechts"{
-                        if zwischen_x>=ende_x{
-                            fertig = true;
-                        }
-                    } else if zwischen_y >= ende_y && richtung_pfeil=="links"{
-                        if zwischen_x<=ende_x{
-                            fertig = true;
-                        }
+                start_y = zwischen_y;
+                zwischen_y = zwischen_y + dazu;
+            } else {
+                let mut tuple = zeiche_pfeil_richtung_eins(start_x, start_y, ende_x, ende_y, zwischen_x, zwischen_y, dazu, dazu_y, richtung_h, richtung_w);
+                start_x = tuple.0;
+                start_y = tuple.1;
+                ende_x = tuple.2;
+                ende_y = tuple.3;
+                zwischen_x = tuple.4;
+                zwischen_y = tuple.5;
+                if zwischen_y >= ende_y && richtung_pfeil == "rechts" {
+                    if zwischen_x >= ende_x {
+                        fertig = true;
                     }
-                    let mut tuple=zeiche_pfeil_richtung_zwei(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y,dazu,dazu_y,anderes,richtung_h,richtung_w);
-                    start_x=tuple.0;
-                    start_y=tuple.1;
-                    ende_x=tuple.2;
-                    ende_y=tuple.3;
-                    zwischen_x=tuple.4;
-                    zwischen_y=tuple.5;
+                } else if zwischen_y >= ende_y && richtung_pfeil == "links" {
+                    if zwischen_x <= ende_x {
+                        fertig = true;
+                    }
                 }
-    }
-    if richtung_pfeil=="links" {
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y-10) as f32), draw_color);
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y+10 ) as f32), draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+30)as u32 , (ende_y+5) as u32, schrift, &font, beschriftung);
-    }else if richtung_pfeil=="rechts"{
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y-10) as f32), draw_color);
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y+10 ) as f32), draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x-80)as u32 , (ende_y+5) as u32, schrift, &font, beschriftung);
-    }else if richtung_pfeil=="oben"{
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y+10) as f32), draw_color);
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y+10 ) as f32), draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+8)as u32 , (ende_y+10) as u32, schrift, &font, beschriftung);
-    }else if richtung_pfeil=="unten"{
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y-10) as f32), draw_color);
-        draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y-10 ) as f32), draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(ende_x+8)as u32 , (ende_y-10) as u32, schrift, &font, beschriftung);
+                let mut tuple = zeiche_pfeil_richtung_zwei(start_x, start_y, ende_x, ende_y, zwischen_x, zwischen_y, dazu, dazu_y, anderes, richtung_h, richtung_w);
+                start_x = tuple.0;
+                start_y = tuple.1;
+                ende_x = tuple.2;
+                ende_y = tuple.3;
+                zwischen_x = tuple.4;
+                zwischen_y = tuple.5;
+            }
+        }
+        if richtung_pfeil == "links" {
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y - 10) as f32), draw_color);
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x + 20) as f32, (zwischen_y + 10) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (kreis_x + 10) as u32, (kreis_y-5) as u32, schrift, &font, beschriftung);
+        } else if richtung_pfeil == "rechts" {
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y - 10) as f32), draw_color);
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (zwischen_y) as f32), ((ende_x - 20) as f32, (zwischen_y + 10) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (kreis_x - 60) as u32, (kreis_y -5) as u32, schrift, &font, beschriftung);
+        } else if richtung_pfeil == "oben" {
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y + 10) as f32), draw_color);
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y + 10) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (ende_x + 8) as u32, (ende_y + 10) as u32, schrift, &font, beschriftung);
+        } else if richtung_pfeil == "unten" {
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x + 10) as f32, (ende_y - 10) as f32), draw_color);
+            draw_line_segment_mut(&mut image, ((ende_x) as f32, (ende_y) as f32), ((ende_x - 10) as f32, (ende_y - 10) as f32), draw_color);
+            draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (ende_x + 8) as u32, (ende_y - 20) as u32, schrift, &font, beschriftung);
+        }
+        if beschriftung=="<<extend>>" {
+            draw_hollow_ellipse_mut(&mut image, (kreis_x as i32, kreis_y as i32), 5 as i32, 5 as i32, draw_color);
+        }
 
     }
-    return(image);
+        else {
+            kreis_x=0;
+            kreis_y=0;
+        }
+    return(image,kreis_x,kreis_y);
 }
 fn name_case(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle: i32,text: &str)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
     let mut image=image;
@@ -616,4 +650,43 @@ fn zeiche_pfeil_richtung_zwei(start_x: i32,start_y: i32,ende_x: i32,ende_y: i32,
                             }
                 }
     return(start_x,start_y,ende_x,ende_y,zwischen_x,zwischen_y)
+}
+fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,text: &str,kreis_x: i32, kreis_y: i32)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+    let mut image=image;
+    let mut anzahl=anzahl;
+    let mut text=text;
+    let mut kreis_x=kreis_x;
+    let mut kreis_y=kreis_y;
+    let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
+    let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+    let schrift = Scale { x: 13.0, y: 13.0 };
+    let mut yo= 50;
+    let mut yu= 100;
+    let mut yh= 70;
+    let mut xl= 960 as f32;
+    let mut xm= 940 as f32;
+    let mut xk= 760;
+    let mut done_create=false;
+    let mut dauer=0;
+    let mut gezeichnet=false;
+    for dauer in 0..anzahl{
+        if dauer>=1 {
+            yo = yo + 60;
+            yu = yu + 60;
+            yh = yh + 60;
+        }
+        draw_line_segment_mut(&mut image,(xk as f32,yo as f32),(xm,yo as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xk as f32,yu as f32),(xl,yu as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xk as f32,yo as f32),(xk as f32,yu as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xl,yu as f32),(xl,yh as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xl,yh as f32),(xm,yo as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xm,yo as f32),(xm,yh as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_line_segment_mut(&mut image,(xm,yh as f32),(xl,yh as f32), Rgb([0u8, 0u8, 0u8]));
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
+    }
+    draw_line_segment_mut(&mut image,(kreis_x as f32 ,kreis_y as f32),(xk as f32,((yo+yu)/2) as f32), Rgb([0u8, 0u8, 0u8]));
+
+
+
+    return(image);
 }
