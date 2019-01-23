@@ -12,12 +12,14 @@ use decoding_to_visual;
 
 pub struct Model {
     pub class_amount: i32,
+    pub class_file_name: String,
     pub use_case_amount: i32,
+    pub use_case_file_name: String,
 }
 
 impl Model {
-    fn new (class_amount: i32, use_case_amount: i32) -> Model {
-        Model {class_amount: class_amount, use_case_amount: use_case_amount }
+    fn new (class_amount: i32, use_case_amount: i32, class_file_name: String, use_case_file_name: String) -> Model {
+        Model {class_amount: class_amount, use_case_amount: use_case_amount, class_file_name: class_file_name, use_case_file_name: use_case_file_name }
     }
 }
 
@@ -47,7 +49,8 @@ pub fn decode_input(given_input: String) -> Model {
             }
         }
     }
-    let model = Model::new(class_diagram_list.len() as i32, use_case_diagram_list.len() as i32);
+    let model = Model::new(class_diagram_list.len() as i32, use_case_diagram_list.len() as i32,
+                           "res/UML_class".to_string(), "res/UML_use_case".to_string());
 
     for j in 0..class_diagram_list.len() {
         decoding_to_visual::call_class_draw(&class_diagram_list[j].classes, &class_diagram_list[j].relations, j as i32)
@@ -55,7 +58,7 @@ pub fn decode_input(given_input: String) -> Model {
 
 
     for i in 0..use_case_diagram_list.len() {
-        decoding_to_visual::call_use_case_draw(&use_case_diagram_list[i]);
+        decoding_to_visual::call_use_case_draw(&use_case_diagram_list[i], i as i32);
     }
 
     return model;

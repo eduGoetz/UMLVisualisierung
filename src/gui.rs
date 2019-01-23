@@ -204,7 +204,7 @@ impl Content {
 
 pub fn gui_main() {
     if gtk::init().is_err() {
-        eprintln!("failed to initialize GTK Application");
+        eprintln!("Fehler");
         process::exit(1);
     }
 
@@ -220,14 +220,19 @@ pub fn gui_main() {
 
         let amount_model = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
 
-        for j in 0..amount_model.class_amount as u32 {
+        for j in 0..(amount_model.class_amount + amount_model.use_case_amount) as u32 {
             notebook_clone.borrow_mut().notebook.remove_page(Some(0));
         }
 
         //*left_pane_clone.borrow_mut() = Image::new_from_file("res/1540040897129.png");
         //Image::set_from_file(&*left_pane_clone.borrow_mut(), "res/UML_visual_result.png");
         for i in 0..amount_model.class_amount {
-            notebook_clone.borrow_mut().create_tab(&["ClassDiagramm", &i.to_string()].join(""), ["res/UML_visual_result", ".png"].join(&i.to_string()));
+            notebook_clone.borrow_mut().create_tab(&["ClassDiagramm", &i.to_string()].join(""), [&amount_model.class_file_name, ".png"].join(&i.to_string()));
+            window_clone.show_all();
+        }
+
+        for j in 0..amount_model.use_case_amount {
+            notebook_clone.borrow_mut().create_tab(&["UseCaseDiagramm", &j.to_string()].join(""), [&amount_model.use_case_file_name, ".png"].join(&j.to_string()));
             window_clone.show_all();
         }
     });

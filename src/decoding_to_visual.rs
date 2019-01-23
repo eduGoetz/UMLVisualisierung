@@ -8,7 +8,7 @@ use visuals;
 
 
 pub fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &Vec<decoder_class::Relation>, class_number: i32) {
-    let path_first_part = "res/UML_visual_result";
+    let path_first_part = "res/UML_class";
     let path_ending = ".png";
     let path_str = [path_first_part, path_ending].join(&class_number.to_string());
     let path = Path::new(&path_str);
@@ -50,11 +50,14 @@ pub fn call_class_draw(class_list: &Vec<decoder_class::Class>, relation_list: &V
 }
 
 
-pub fn call_use_case_draw(use_case_diagram: &decoder_usecase::UseCaseDiagramm) {
+pub fn call_use_case_draw(use_case_diagram: &decoder_usecase::UseCaseDiagramm, use_case_number: i32) {
     let mut image = visuals::erstelle_image();
+    let path_first_part = "res/UML_use_case";
+    let path_ending = ".png";
+    let path_str = [path_first_part, path_ending].join(&use_case_number.to_string());
+    let path = Path::new(&path_str);
 
-    image = visuals::create_system_and_akteur(image.clone(), &use_case_diagram.name, &use_case_diagram.actors);
-    image = visuals::create_cases(image.clone(), &use_case_diagram.use_cases);
-    image = visuals::create_relations(image.clone(), &use_case_diagram.use_case_realtions);
-
+    image = visuals::create_system_and_akteur(path, image.clone(), &use_case_diagram.name, &use_case_diagram.actors);
+    image = visuals::create_cases(path, image.clone(), &use_case_diagram.use_cases);
+    image = visuals::create_relations(path, image.clone(), &use_case_diagram.use_case_realtions);
 }

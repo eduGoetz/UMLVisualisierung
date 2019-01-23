@@ -91,7 +91,7 @@ pub fn erstelle_image()->(image::ImageBuffer<Rgb<u8>, Vec<u8> >){
 
 pub fn main() {
 }
-pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: &Vec<Actor>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_system_and_akteur(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: &Vec<Actor>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
     let mut systemname=systemname;
     let mut done_create=false;
@@ -107,16 +107,16 @@ pub fn create_system_and_akteur(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,syst
         match relation {
             Some(relation) => image = draw_relationship_akteur(image, position,relation, "l"),
             None => (),
-        }//UseCase~Name;1:Akteur::1,;1:schlafen:EP,2:laufen:;extends:2->1,include:1->2
+        }
         for id in &vec_akteure[vec_stelle].has_use_case{
             image=draw_case_with_assoziation(image,*id,position,"","","l");
         }
     }
 
-    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    let _ = image.save(path).unwrap();
     return(image);
 }
-pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<UseCase>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
+pub fn create_cases(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<UseCase>)-> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
     let mut done_create=false;
     let mut vec_stelle=0;
@@ -138,19 +138,16 @@ pub fn create_cases(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec_cases: &Vec<
             done_create=true;
         }
     }
-    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    let _ = image.save(path).unwrap();
     return(image);
 }
-pub fn create_relations(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<UseCaseRelation>)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
+pub fn create_relations(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<UseCaseRelation>)->(image::ImageBuffer<Rgb<u8>, Vec<u8>>){
     let mut image=image;
     let mut done_create=false;
     let mut vec_stelle=0;
 
-    println!("{:?}", vec);
     for rel in vec{
-        println!("FDFdf");
         if let UseCaseRelationType::Include = rel.relation_type {
-            println!("{},{}", rel.from, rel.to);
             image=draw_arrow(image,rel.from,rel.to,"<<include>>");
         }
         else{
@@ -160,7 +157,7 @@ pub fn create_relations(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,vec: &Vec<Us
         //nach ist zu welchem case gezeichnet wird      (i32)
         //beschriftung ist ob include oder extend       (&str)
     }
-    let _ = image.save(Path::new("res/UML_visual_result.png")).unwrap();
+    let _ = image.save(path).unwrap();
     return(image);
 }
 fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {

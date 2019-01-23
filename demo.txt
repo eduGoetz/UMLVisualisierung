@@ -6,11 +6,55 @@ Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=n
 
 ---
 
-UseCase~Systemname;1:Akteur::1 2 3 4,;1:Feier auflösen:extendion point,;extends:1->2,include:2->1
-
-UseCase~Name;1:Akteur:1:1,;2:schlafen:EP,;extends:1->2,include:2->1
-
 UseCase~Name;
 1:Akteur::1,2:Lorenzo:1:2;
-1:schlafen:EP,2:laufen:,3:essen:;
-extends:2->1,include:2->3
+1:schlafen:EP,2:laufen:,3:essen:,4:laufen:,5:laufen:,6:laufen:,7:laufen:,8:laufen:,9:laufen:,10:laufen:,11:laufen:,12:laufen:,13:laufen:,14:laufen:;
+Extends:2->1,Include:2->3
+
+---
+
+Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+
+---
+
+UseCase~Einweihungsfeier;
+
+1:Gast::2 6 7 8,
+3:Gastgeber:1:12 14 16,
+5:Polizei::20;
+
+2:Tanzen:,
+6:Nachschub Trinken:ext,
+7:Unterhalten:,
+8:Nachschub Essen:ext,
+12:Pizzaservice anrufen:,
+14:Feier auflösen:,
+16:Gäste hinausbegleiten:,
+20:Feier abrupt beenden:;
+
+Extends:12->6,
+Extends:12->8,
+Include:14->16,
+Include:20->16
+
+---
+
+UseCase~Einweihungsfeier;
+
+1:Gast::1 2 3 4,
+2:Gastgeber:1:5 6 7,
+3:Polizei::8;
+
+1:Tanzen:,
+2:Nachschub Trinken:ext,
+3:Unterhalten:,
+4:Nachschub Essen:ext,
+5:Pizzaservice anrufen:,
+6:Feier auflösen:,
+7:Gäste hinausbegleiten:,
+8:Feier abrupt beenden:;
+
+Extends:5->2,
+Extends:5->4,
+Include:8->7,
+Include:6->7
