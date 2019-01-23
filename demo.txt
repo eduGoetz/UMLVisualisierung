@@ -2,21 +2,6 @@ Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=n
 
 ---
 
-Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
-
----
-
-UseCase~Name;
-1:Akteur::1,2:Lorenzo:1:2;
-1:schlafen:EP,2:laufen:,3:essen:,4:laufen:,5:laufen:,6:laufen:,7:laufen:,8:laufen:,9:laufen:,10:laufen:,11:laufen:,12:laufen:,13:laufen:,14:laufen:;
-Extends:2->1,Include:2->3
-
----
-
-Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
-
----
-
 UseCase~Einweihungsfeier;
 
 1:Gast::2 6 7 8,
@@ -24,9 +9,9 @@ UseCase~Einweihungsfeier;
 5:Polizei::20;
 
 2:Tanzen:,
-6:Nachschub Trinken:ext,
+6:Nachschub Trinken:EP,
 7:Unterhalten:,
-8:Nachschub Essen:ext,
+8:Nachschub Essen:EP,
 12:Pizzaservice anrufen:,
 14:Feier auflösen:,
 16:Gäste hinausbegleiten:,
@@ -46,9 +31,9 @@ UseCase~Einweihungsfeier;
 3:Polizei::8;
 
 1:Tanzen:,
-2:Nachschub Trinken:ext,
+2:Nachschub Trinken:EP,
 3:Unterhalten:,
-4:Nachschub Essen:ext,
+4:Nachschub Essen:EP,
 5:Pizzaservice anrufen:,
 6:Feier auflösen:,
 7:Gäste hinausbegleiten:,

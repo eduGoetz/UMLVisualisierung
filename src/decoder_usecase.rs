@@ -100,11 +100,12 @@ fn decode_actors(actors_str: String) -> Vec<Actor> {
 
 
 pub fn decode_use_cases(use_cases_str: String) -> Vec<UseCase> {
-    let use_case_regex = Regex::new(r"((\d+:\w+:(EP)?)(,)?)").unwrap();
+    let use_case_regex = Regex::new(r"((\d+:(\w|\s)+:(EP)?)(,)?)").unwrap();
     let mut use_case_return = Vec::new();
 
     let use_case_strings = use_cases_str.split(",");
     for uc_str in use_case_strings {
+        println!("{}", uc_str);
         if use_case_regex.is_match(uc_str.as_ref()) {
             let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
