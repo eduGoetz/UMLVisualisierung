@@ -25,7 +25,7 @@ use std::ops::Mul;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 use image::GenericImageView;
-use visuals::*;
+use visuals::draw_text_mut;
 
 pub fn create_system_and_akteur(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,systemname:&str,vec_akteure: &Vec<Actor>)  -> (image::ImageBuffer<Rgb<u8>, Vec<u8>>) {
     let mut image=image;
@@ -669,7 +669,7 @@ fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,te
     let mut done_create=false;
     let mut dauer=0;
     let mut gezeichnet=false;
-    while !done_create{
+    for dauer in 0..anzahl{
         if dauer>=1 {
             yo = yo + 60;
             yu = yu + 60;
@@ -683,12 +683,8 @@ fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,te
         draw_line_segment_mut(&mut image,(xm,yo as f32),(xm,yh as f32), Rgb([0u8, 0u8, 0u8]));
         draw_line_segment_mut(&mut image,(xm,yh as f32),(xl,yh as f32), Rgb([0u8, 0u8, 0u8]));
         draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
-        dauer=dauer+1;
-        if dauer==anzahl{
-            draw_line_segment_mut(&mut image,(kreis_x as f32 ,kreis_y as f32),(xk as f32,((yo+yu)/2) as f32), Rgb([0u8, 0u8, 0u8]));
-            done_create=true;
-        }
     }
+    draw_line_segment_mut(&mut image,(kreis_x as f32 ,kreis_y as f32),(xk as f32,((yo+yu)/2) as f32), Rgb([0u8, 0u8, 0u8]));
 
 
 

@@ -25,7 +25,7 @@ use std::ops::Mul;
 use image::{Rgb,RgbImage};
 use rusttype::{FontCollection};
 use image::GenericImageView;
-use visuals::*;
+use visuals::draw_text_mut;
 
 
 pub fn klasse(ueberschrift: &str,klassentyp: &str,image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,file: &std::path::Path,anzahl: i32,vec_attribute: &Vec<Attribute>,vec_methode: &Vec<Method>)
@@ -142,7 +142,7 @@ fn zeichne_schrift(image: image::ImageBuffer<Rgb<u8>, Vec<u8> >,name: &str,klass
         schreiben=910;
     }
     if sichtbarkeit_ueberschrift == "Paket"{
-        visuals::draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, "Paket::");
+        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+5, ab+5, ueberschrift, &font, "Paket::");
         draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), erster_wert_x+42, ab+5, ueberschrift, &font, eingabe_ueberschift);
     }else if sichtbarkeit_ueberschrift=="Interface"{
         let mut ueberschrift = Scale { x: 12.0 , y: 12.0 };
