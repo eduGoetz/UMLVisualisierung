@@ -162,9 +162,45 @@ pub fn decode_use_case_diagram(diagram_input: String) -> (Option<UseCaseDiagramm
     if diagram_input_regex.is_match(diagram_input.as_ref()) {
         let use_case_diagram_comp: Vec<String> = diagram_input.split(&";".to_string()).map(|x| x.to_owned()).collect();
 
-        let uc_actors_result = decode_actors(use_case_diagram_comp[1].to_string());
+        let mut uc_actors_result = decode_actors(use_case_diagram_comp[1].to_string());
         let uc_use_cases_result = decode_use_cases(use_case_diagram_comp[2].to_string());
-        let uc_relations_result = decode_use_case_relations(use_case_diagram_comp[3].to_string());
+        let mut uc_relations_result = decode_use_case_relations(use_case_diagram_comp[3].to_string());
+
+        let mut case_id_vec = Vec::new();
+        for use_case in &uc_use_cases_result.0{
+            case_id_vec.push(use_case.id);
+        }
+
+        let mut deletList = Vec::new();
+        for i in 0..uc_actors_result.0.len() {
+            for j in 0..uc_actors_result.0[i].has_use_case.len(){
+                for  k in 0..uc_use_cases_result.0.len() {
+                    if &uc_actors_result.0[i].has_use_case[j] == &uc_use_cases_result.0[k].id {
+                        break;
+                    } else{
+                        if k == uc_use_cases_result.0.len()-1{
+                            deletList.push(j);
+                        }
+                    }
+                }
+            }
+            for num in (0..deletList.len()).rev(){
+                uc_actors_result.0[i].has_use_case.remove(deletList[num]);
+            }
+            deletList.clear();
+        }
+
+        for j in 0..uc_relations_result.0.len(){
+            if(!case_id_vec.contains(&uc_relations_result.0[j].to)) || (!case_id_vec.contains(&uc_relations_result.0[j].from)){
+                deletList.push(j);
+            }
+        }
+
+        for num in (0..deletList.len()).rev(){
+            uc_relations_result.0.remove(deletList[num]);
+        }
+        deletList.clear();
+
 
         let errors = [[uc_actors_result.1, uc_use_cases_result.1].join(""), uc_relations_result.1].join("");
         return (Some(UseCaseDiagramm::new(use_case_diagram_comp[0].to_string(), uc_actors_result.0,

@@ -212,15 +212,9 @@ fn draw_case_with_assoziation(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,stelle
     anfang = anfang + (130 * person);
     if side == "l" {
         draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse - 50) as f32, y_ellipse as f32), draw_color);
-        draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang + 10) as u32, (anfang - 5) as u32, schrift, &font, von);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse - 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
     } else if side == "r" {
         x_anfang = 920;
         draw_line_segment_mut(&mut image, (x_anfang as f32, anfang as f32), ((x_ellipse + 50) as f32, y_ellipse as f32), draw_color);
-        draw_hollow_ellipse_mut(&mut image, (x_ellipse as i32, y_ellipse as i32), 50 as i32, 25 as i32, draw_color);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_anfang - 10) as u32, (anfang - 5) as u32, schrift, &font, von);
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]), (x_ellipse + 60) as u32, (y_ellipse) as u32, schrift, &font, nach);
     }
     return (image);
 }

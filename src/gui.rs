@@ -34,6 +34,7 @@ pub struct Content {
     pub input: TextBuffer,
     pub class_template_button: Button,
     pub relation_template_button: Button,
+    pub use_case_template_button: Button,
     pub noti_label: Label,
     pub start_button: Button,
 }
@@ -167,6 +168,14 @@ impl Content {
             input_clone.set_text([get_current_input(&input_clone), template].join("").as_ref());
         });
 
+        let use_case_template_button = Button::new_with_label("Neues Use-Case-Diagramm-Template");
+        let input_clone = input.clone();
+        use_case_template_button.connect_clicked(move |_ | {
+            let template = "UseCase~Name;\nAkteurID:AkteurName:erbtVon:usecase usecase usecase,;\n\
+            Use-CaseID:Use-CaseName:EP(extension point),;\nExtends:IDvon->IDzu:Bemerkung,".to_owned();
+            input_clone.set_text([get_current_input(&input_clone), template].join("").as_ref());
+        });
+
         let start_button = Button::new_with_label("Los");
         start_button.get_style_context().map(|c| c.add_class("suggested-action"));
 
@@ -190,6 +199,7 @@ impl Content {
         right_pane.set_border_width(5);
         right_pane.pack_start(&class_template_button, false, false, 0);
         right_pane.pack_start(&relation_template_button, false, false, 0);
+        right_pane.pack_start(&use_case_template_button, false, false, 12);
         right_pane.pack_start(&input_scrolled, true, true, 0);
         right_pane.pack_start(&noti_label, false, true, 0);
         right_pane.pack_start(&start_button, false, true, 0);
@@ -197,7 +207,7 @@ impl Content {
         container.pack1(&notebook.borrow_mut().notebook, true, true);
         container.pack2(&right_pane, true, true);
 
-        Content { container, notebook, input, class_template_button, relation_template_button, noti_label, start_button }
+        Content { container, notebook, input, class_template_button, relation_template_button, use_case_template_button, noti_label, start_button }
     }
 }
 

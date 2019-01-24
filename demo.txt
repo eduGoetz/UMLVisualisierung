@@ -21,25 +21,3 @@ Extends:12->6:condition {Kühlschrank leer},
 Extends:12->8:condition {Kühlschrank leer},
 Include:14->16:,
 Include:20->16:
-
----
-
-UseCase~Einweihungsfeier;
-
-1:Gast::1 2 3 4,
-2:Gastgeber:1:5 6 7,
-3:Polizei::8;
-
-1:Tanzen:,
-2:Nachschub Trinken:EP,
-3:Unterhalten:,
-4:Nachschub Essen:EP,
-5:Pizzaservice anrufen:,
-6:Feier auflösen:,
-7:Gäste hinausbegleiten:,
-8:Feier abrupt beenden:;
-
-Extends:5->2:,
-Extends:5->4:,
-Include:8->7:,
-Include:6->7:
