@@ -26,7 +26,7 @@
     5. Name, kann ebenfalls alles mögliche sein.
     6. Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt
 ### Use-Case
-#### Komplettes Beispiel:UseCase~Systemname;5:Akteur:4:20;20:Case name:EP;
+#### Komplettes Beispiel:UseCase~Systemname;5:Akteur:4:20;20:Case name:EP;Extends:12->8:condition {text},Include:20->16:
 #### Ein Use-Case besteht hier aus mehreren Komponenten und diese Komponenten werden mit ";" Semikolon getrennt:
   * Name<br/>
     Jedes Use-Case hat einen Systemnamen. Der Systemname wird direkt am Anfang angegeben.<br/> 
@@ -44,7 +44,7 @@
     Die 20 gibt an das, dass Case an der Stelle 20 erstellt wird und das EP bedeutet das es sich um ein Extend Case handelt, wird das         EP weggelassen dann wird ein normales Case erstellt.<br/>
   * Extend und Include<br/>
     Es können auch Extend und Include beziehungen zwischen den einzelnen Cases erstellt werden.<br/>
-    Bsp. für Extend:Extends:12->8:condition {Kühlschrank leer},<br/>
+    Bsp. für Extend:Extends:12->8:condition {Text},<br/>
     Bsp. für IncludeInclude:20->16:<br/>
     Anfangs schreibt man "Extends:" oder "Include:" hin, je nach dem ob es Extend oder Include sein soll.<br/>
     Nach dem Doppeltpunkt wird zuerst das Case angegeben von wo aus das Extend oder Include aus gezeichnet wird angegeben und dann folgt      ein Pfeil "->", gefolgt von dem Case wohin gezeichnet werden soll. Zum schluss wird dann wenn es ein Extend ist angegeben welche        condition dieses Extend hat. Dieses wird folgendermaßen angegeben   condition {Kühlschrank leer}    zuerst schreibt man condition         und die die geschweiften Klammern kommt dann der jeweilige Text.
