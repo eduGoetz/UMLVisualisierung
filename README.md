@@ -19,12 +19,12 @@
     * Datentyp, kann alles mögliche sein.<br/>
     * Name, kann ebenfalls alles mögliche sein.<br/>
    * Methoden<br/>
-    * Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
-    * Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
-    * Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
-    * Rückgabetyp, kann alles mögliche sein.<br/>
-    * Name, kann ebenfalls alles mögliche sein.<br/>
-    * Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt<br/>
+       * Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
+       * Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+       * Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+       * Rückgabetyp, kann alles mögliche sein.<br/>
+       * Name, kann ebenfalls alles mögliche sein.<br/>
+       * Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt<br/>
 ### Use-Case
 #### Komplettes Beispiel:UseCase~Systemname;5:Akteur:4:20;20:Case name:EP;Extends:12->8:condition {text},Include:20->16:
 #### Ein Use-Case besteht hier aus mehreren Komponenten und diese Komponenten werden mit ";" Semikolon getrennt:
