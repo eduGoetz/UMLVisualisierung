@@ -110,14 +110,16 @@ pub fn decode_use_cases(use_cases_str: String) -> (Vec<UseCase>, String) {
 
     let use_case_strings = use_cases_str.split(",");
     for uc_str in use_case_strings {
-        if use_case_regex.is_match(uc_str.as_ref()) {
-            let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
+        if uc_str != "" {
+            if use_case_regex.is_match(uc_str.as_ref()) {
+                let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
-            let num = use_case_components[0].to_string().parse::<i32>().unwrap();
-            use_case_return.push(UseCase::new(num,
-                                              use_case_components[1].to_string(), use_case_components[2].to_string() != ""));
-        } else{
-            errors = [errors, "Das Use-Case-Layout ist falsch, mind. ein Use-Case übersprungen.\n".to_string()].join("");
+                let num = use_case_components[0].to_string().parse::<i32>().unwrap();
+                use_case_return.push(UseCase::new(num,
+                                                  use_case_components[1].to_string(), use_case_components[2].to_string() != ""));
+            } else {
+                errors = [errors, "Das Use-Case-Layout ist falsch, mind. ein Use-Case übersprungen.\n".to_string()].join("");
+            }
         }
     }
     return (use_case_return, errors);
@@ -207,4 +209,96 @@ pub fn decode_use_case_diagram(diagram_input: String) -> (Option<UseCaseDiagramm
                                          uc_use_cases_result.0, uc_relations_result.0)), errors);
     }
     return (None, "".to_string());
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_decode_use_cases() {
+        let result = decode_use_cases("2:Tanzen:,6:Nachschub Trinken:EP,".to_string());
+        assert_eq!(result.0.is_empty(), false);
+        assert_eq!(result.1, "");
+        assert_eq!(result.0.len(), 2);
+
+        assert_eq!(result.0[0].id, 2);
+        assert_eq!(result.0[1].id, 6);
+
+        assert_eq!(result.0[0].name, "Tanzen");
+        assert_eq!(result.0[1].name, "Nachschub Trinken");
+
+        assert_eq!(result.0[0].is_extension_point, false);
+        assert_eq!(result.0[1].is_extension_point, true);
+    }
+
+
+    #[test]
+    fn test_decode_use_cases_error(){
+        let result = decode_use_cases("2:Tanzen:,6:Nachschub Trinken:FALSCH,".to_string());
+        assert_eq!(result.0.is_empty(), false);
+        assert_eq!(result.1, "Das Use-Case-Layout ist falsch, mind. ein Use-Case übersprungen.\n".to_string());
+        assert_eq!(result.0.len(), 1);
+
+        assert_eq!(result.0[0].id, 2);
+        assert_eq!(result.0[0].name, "Tanzen");
+        assert_eq!(result.0[0].is_extension_point, false);
+    }
+
+
+    #[test]
+    fn test_decode_use_cases_empty() {
+        let result = decode_use_cases("fdfdfdf".to_string());
+        assert_eq!(result.0.is_empty(), true);
+    }
+
+
+
+
+    #[test]
+    fn test_decode_actors() {
+        let result =  decode_actors("3:Gastgeber:1:12 14 16,5:Polizei::20".to_string());
+        assert_eq!(result.0.is_empty(), false);
+        assert_eq!(result.1, "");
+        assert_eq!(result.0.len(), 2);
+
+        assert_eq!(result.0[0].id, 3);
+        assert_eq!(result.0[1].id, 5);
+
+        assert_eq!(result.0[0].name, "Gastgeber");
+        assert_eq!(result.0[1].name, "Polizei");
+
+        assert_eq!(result.0[0].extends_from, Some(1));
+        assert_eq!(result.0[1].extends_from, None);
+
+        let mut num = 12;
+        for i in 0..3{
+            assert_eq!(result.0[0].has_use_case[i], num);
+            num = num+2;
+        }
+        assert_eq!(result.0[1].has_use_case[0], 20);
+    }
+
+
+    #[test]
+    fn test_decode_actors_error() {
+        let result = decode_actors("FALSCH,5:Polizei::20".to_string());
+        assert_eq!(result.0.is_empty(), false);
+        assert_eq!(result.1, "Das Akteurlayout ist falsch, mind. ein Akteur übersprungen.\n".to_string());
+        assert_eq!(result.0.len(), 1);
+
+        assert_eq!(result.0[0].id, 5);
+        assert_eq!(result.0[0].name, "Polizei");
+        assert_eq!(result.0[0].extends_from, None);
+        assert_eq!(result.0[0].has_use_case[0], 20);
+    }
+
+
+    #[test]
+    fn test_decode_actors_empty() {
+        let result = decode_actors("fdfdfdf".to_string());
+        assert_eq!(result.0.is_empty(), true);
+        assert_eq!(result.1, "Das Akteurlayout ist falsch, mind. ein Akteur übersprungen.\n");
+    }
 }

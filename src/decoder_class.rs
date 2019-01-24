@@ -412,7 +412,6 @@ fn decode_relations(relations_str: String) -> (Vec<Relation>, String) {
 
 
 pub fn decode_class_diagram(given_input: String) -> (Option<ClassDiagram>, String) {
-    println!("{}", given_input);
     let input_regex = Regex::new(r"^(.*\|.*)?$").unwrap();
     let input = given_input.to_string();
     let mut class_list = Vec::new();
@@ -434,4 +433,18 @@ pub fn decode_class_diagram(given_input: String) -> (Option<ClassDiagram>, Strin
     }
 
     return (None,"".to_string());
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_decode_classes() {
+        let result = decode_classes("Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/".to_string());
+        assert_eq!(result.0.is_empty(), false);
+        assert_eq!(result.1, "");
+    }
 }
