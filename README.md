@@ -25,6 +25,16 @@
        * Rückgabetyp, kann alles mögliche sein.<br/>
        * Name, kann ebenfalls alles mögliche sein.<br/>
        * Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt<br/>
+   * Relationen<br/>
+       * Relationen können ganz am ende angegeben werden. Wobei die einzelnen Relationen verschiedene Abkürzungen haben.
+          * V  = Vererbung
+          * AG = Aggregation
+          * K  = Komposition
+          * A  = Asspziation
+          * gA = gerichtete Assoziation 
+          * I  = Implementierung
+          * AB = abhängigkeit
+          
 ### Use-Case
 #### Komplettes Beispiel:UseCase~Systemname;5:Akteur:4:20;20:Case name:EP;Extends:12->8:condition {text},Include:20->16:
 #### Ein Use-Case besteht hier aus mehreren Komponenten und diese Komponenten werden mit ";" Semikolon getrennt:
