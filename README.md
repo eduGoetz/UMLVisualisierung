@@ -5,26 +5,26 @@
 
 ## Syntax
 ### Klasse
-* Eine Klasse besteht hier aus mehreren Komponenten:
-  1. ID
-  Jede Klasse hat hier eine ID, die benutzt wird um Klassen zu identifizieren und einander zuordnen zu können. Wie viele Dinge hier führt eine falsche Eingabe hier zum Überspringen der Klasse.
-  2. Typ
-  Eine Klasse kann vom Typ *Interface*, *Class* oder *Abstract* sein.
-  3. Name
-  Der Name der Klasse, hier muss man sich nicht an z.B. Javakonventionen halten, sollte man aber generell.
-  4. Attribute
-    1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.
-    2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.
-    3. Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.
-    4. Datentyp, kann alles mögliche sein.
-    5. Name, kann ebenfalls alles mögliche sein.
-   5. Methoden
-    1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.
-    2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.
-    3. Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.
-    4. Rückgabetyp, kann alles mögliche sein.
-    5. Name, kann ebenfalls alles mögliche sein.
-    6. Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt
+#### Eine Klasse besteht hier aus mehreren Komponenten:<br/>
+  * ID<br/>
+  Jede Klasse hat hier eine ID, die benutzt wird um Klassen zu identifizieren und einander zuordnen zu können. Wie viele Dinge hier führt eine falsche Eingabe hier zum Überspringen der Klasse.<br/>
+  * Typ<br/>
+  Eine Klasse kann vom Typ *Interface*, *Class* oder *Abstract* sein.<br/>
+  * Name<br/>
+  Der Name der Klasse, hier muss man sich nicht an z.B. Javakonventionen halten, sollte man aber generell.<br/>
+  * Attribute<br/>
+    1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
+    2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    3. Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    4. Datentyp, kann alles mögliche sein.<br/>
+    5. Name, kann ebenfalls alles mögliche sein.<br/>
+   * Methoden<br/>
+    1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
+    2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    3. Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    4. Rückgabetyp, kann alles mögliche sein.<br/>
+    5. Name, kann ebenfalls alles mögliche sein.<br/>
+    6. Die Parameter bestehen immer aus zwei Teilen: Datentyp und name, dies schreibt man in der Form Datentyp=name, mehrere Parameter sind durch Leerzeichen getrennt<br/>
 ### Use-Case
 #### Komplettes Beispiel:UseCase~Systemname;5:Akteur:4:20;20:Case name:EP;Extends:12->8:condition {text},Include:20->16:
 #### Ein Use-Case besteht hier aus mehreren Komponenten und diese Komponenten werden mit ";" Semikolon getrennt:
