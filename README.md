@@ -47,4 +47,4 @@
     * Bsp. für Extend:Extends:12->8:condition {Text},<br/>
     * Bsp. für IncludeInclude:20->16:<br/>
     * Anfangs schreibt man "Extends:" oder "Include:" hin, je nach dem ob es Extend oder Include sein soll.<br/>
-    Nach dem Doppeltpunkt wird zuerst das Case angegeben von wo aus das Extend oder Include aus gezeichnet wird angegeben und dann folgt      ein Pfeil "->", gefolgt von dem Case wohin gezeichnet werden soll. Zum schluss wird dann wenn es ein Extend ist angegeben welche        condition dieses Extend hat. Dieses wird folgendermaßen angegeben   condition {Kühlschrank leer}    zuerst schreibt man condition         und die die geschweiften Klammern kommt dann der jeweilige Text.
+    Nach dem Doppeltpunkt wird zuerst das Case angegeben von wo aus das Extend oder Include aus gezeichnet wird angegeben und dann folgt      ein Pfeil "->", gefolgt von dem Case wohin gezeichnet werden soll. Zum schluss wird dann wenn es ein Extend ist angegeben welche        condition dieses Extend hat. Um diese zu Beschiften gibt man nach dem Doppelpunkt einfach den Text an.
