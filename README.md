@@ -47,14 +47,14 @@
      * Die 5 sagt an welcher Stelle der Akteur erstellt wird (1-8).<br/>
      * Dort wo Akteur steht ist der Name von dem Akteur an der Stelle 5.<br/>
      * Die 4 sagt das dieser Akteur an stelle 5 von dem Akteur an Stelle 4 erbt.<br/>
-     * Die 20 gibt an das dieser Akteur an der Position 5 mit einem Case an der Stelle 20 per assoziation verbunden ist, hinter der 20        kann man mit Komma getrennt weitere Case Assoziations verbindungen erstellen. <br/>
+     * Die 20 gibt an das dieser Akteur an der Position 5 mit einem Case an der Stelle 20 per assoziation verbunden ist, hinter der 20        kann man mit Leerzeichen getrennt, weitere Case Assoziations-Verbindungen erstellen. <br/>
   * Cases<br/>
     * Jedes Use-Case besteht aus einem oder mehreren Cases. Die Cases können mit beschriftung erstellt werden.<br/>
     * Bsp:20:Case name:EP;<br/>
     * Die 20 gibt an das, dass Case an der Stelle 20 erstellt wird und das EP bedeutet das es sich um ein Extend Case handelt, wird das         EP weggelassen dann wird ein normales Case erstellt.<br/>
   * Extend und Include<br/>
     * Es können auch Extend und Include beziehungen zwischen den einzelnen Cases erstellt werden.<br/>
-    * Bsp. für Extend:Extends:12->8:condition {Text},<br/>
+    * Bsp. für Extend:Extends:12->8:Beliebige Kondition,<br/>
     * Bsp. für IncludeInclude:20->16:<br/>
     * Anfangs schreibt man "Extends:" oder "Include:" hin, je nach dem ob es Extend oder Include sein soll.<br/>
     Nach dem Doppeltpunkt wird zuerst das Case angegeben von wo aus das Extend oder Include aus gezeichnet wird angegeben und dann folgt      ein Pfeil "->", gefolgt von dem Case wohin gezeichnet werden soll. Zum schluss wird dann wenn es ein Extend ist angegeben welche        condition dieses Extend hat. Um diese zu Beschiften gibt man nach dem Doppelpunkt einfach den Text an.
