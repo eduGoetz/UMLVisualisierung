@@ -214,11 +214,13 @@ pub fn gui_main() {
     //let notebook = gui.content.notebook;
     let notebook_clone = gui.content.notebook.clone();
     let input_clone = gui.content.input.clone();
+    let label_clone = gui.content.noti_label.clone();
     gui.content.start_button.connect_clicked(move |_| {
         //let errors = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
         //label_clone.set_text(errors.as_ref());
 
         let amount_model = decoder::decode_input(get_current_input(&input_clone).replace('\n', ""));
+        label_clone.set_label(&amount_model.errors);
 
         for j in 0..(amount_model.class_amount + amount_model.use_case_amount) as u32 {
             notebook_clone.borrow_mut().notebook.remove_page(Some(0));

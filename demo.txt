@@ -1,0 +1,64 @@
+
+Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+
+
+
+---
+
+
+
+Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+
+
+
+---
+
+
+
+UseCase~Systemname;1:Akteur::1 2 3 4,3:Akteur::1,;1:Feier auflösen:extendion point,;extends:1->2,include:2->1
+
+
+
+UseCase~Name;1:Akteur::1,3:Akteur::1 2 3 4,2:Akteur::3,;2:schlafen:EP,;extends:1->2,include:2->1
+
+UseCase~Name;1:Akteur::1,2:Mann:1:2,4:Akteur::1,3;1:schlafen:EP,2:laufen:,3:essen:;extends:2->1,include:2->3
+
+
+
+UseCase~Einweihungsfeier;
+
+
+1:Gast::2 6 7 8,
+
+3:Gastgeber:1:12 14 16,
+
+5:Polizei::20;
+
+
+
+2:Tanzen:,
+
+6:Nachschub Trinken:EP,
+
+7:Unterhalten:,
+
+8:Nachschub Essen:EP,
+
+12:Pizzaservice anrufen:,
+
+14:Feier auflösen:,
+
+16:Gäste hinausbegleiten:,
+
+20:Feier abrupt beenden:;
+
+
+
+Extends:12->6,
+
+Extends:12->8,
+
+Include:14->16,
+
+Include:20->16
+

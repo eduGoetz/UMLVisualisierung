@@ -53,11 +53,12 @@ pub struct UseCaseRelation {
     pub relation_type: UseCaseRelationType,
     pub from: i32,
     pub to: i32,
+    pub note: String,
 }
 
 impl UseCaseRelation {
-    fn new(relation_type: UseCaseRelationType, from: i32, to: i32) -> UseCaseRelation {
-        UseCaseRelation { relation_type: relation_type, from: from, to: to }
+    fn new(relation_type: UseCaseRelationType, from: i32, to: i32, note: String) -> UseCaseRelation {
+        UseCaseRelation { relation_type: relation_type, from: from, to: to, note: note}
     }
 }
 
@@ -69,8 +70,9 @@ pub enum UseCaseRelationType {
 }
 
 
-fn decode_actors(actors_str: String) -> Vec<Actor> {
-    let actor_regex = Regex::new(r"(\d+:\w+:(\d+)?:(\d+( )?)?)").unwrap();
+fn decode_actors(actors_str: String) -> (Vec<Actor>, String) {
+    let actor_regex = Regex::new(r"^(\d+:\w+:(\d+)?:((\d+( )?)*)?)$").unwrap();
+    let mut errors = "".to_string();
     let mut actors_return = Vec::new();
 
     let actors_strings = actors_str.split(",");
@@ -93,34 +95,38 @@ fn decode_actors(actors_str: String) -> Vec<Actor> {
 
             actors_return.push(Actor::new(actor_components[0].to_string().parse::<i32>().unwrap(), actor_components[1].to_string(),
                                           extends_from, actor_use_cases));
+        } else{
+            errors = [errors, "Das Akteurlayout ist falsch, mind. ein Akteur übersprungen.\n".to_string()].join("");
         }
     }
-    return actors_return;
+    return (actors_return, errors);
 }
 
 
-pub fn decode_use_cases(use_cases_str: String) -> Vec<UseCase> {
-    let use_case_regex = Regex::new(r"((\d+:(\w|\s)+:(EP)?)(,)?)").unwrap();
+pub fn decode_use_cases(use_cases_str: String) -> (Vec<UseCase>, String) {
+    let use_case_regex = Regex::new(r"^((\d+:(\w|\s)+:(EP)?)(,)?)$").unwrap();
+    let mut errors = "".to_string();
     let mut use_case_return = Vec::new();
 
     let use_case_strings = use_cases_str.split(",");
     for uc_str in use_case_strings {
-        println!("{}", uc_str);
         if use_case_regex.is_match(uc_str.as_ref()) {
             let use_case_components: Vec<String> = uc_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
             let num = use_case_components[0].to_string().parse::<i32>().unwrap();
             use_case_return.push(UseCase::new(num,
                                               use_case_components[1].to_string(), use_case_components[2].to_string() != ""));
+        } else{
+            errors = [errors, "Das Use-Case-Layout ist falsch, mind. ein Use-Case übersprungen.\n".to_string()].join("");
         }
     }
-
-    return use_case_return;
+    return (use_case_return, errors);
 }
 
 
-fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRelation> {
-    let relation_use_case_regex = Regex::new(r"((Extends|Include):\d+->\d+)").unwrap();
+fn decode_use_case_relations(use_cases_relations_str: String) -> (Vec<UseCaseRelation>, String) {
+    let relation_use_case_regex = Regex::new(r"^((Extends|Include):\d+->\d+:(.*)$)").unwrap();
+    let mut errors = "".to_string();
     let mut relation_uc_return = Vec::new();
 
     let use_cases_realtions_strings = use_cases_relations_str.split(",");
@@ -140,21 +146,29 @@ fn decode_use_case_relations(use_cases_relations_str: String) -> Vec<UseCaseRela
                 from_to_vec.push(f_t_uc.parse::<i32>().unwrap());
             }
 
-            relation_uc_return.push(UseCaseRelation::new(relation_type_uc, from_to_vec[0], from_to_vec[1]));
+            relation_uc_return.push(UseCaseRelation::new(relation_type_uc, from_to_vec[0], from_to_vec[1], relation_uc_components[2].to_string()));
+        } else{
+            errors = [errors, "Das Use-Case-Beziehungslayout ist falsch, mind. eine Use-Case-Beziehung übersprungen.\n".to_string()].join("");
         }
     }
-    return relation_uc_return;
+    return (relation_uc_return, errors);
 }
 
 
-pub fn decode_use_case_diagram(diagram_input: String) -> Option<UseCaseDiagramm> {
-    let diagram_input_regex = Regex::new(r"(\w+;.*;.*;.*)").unwrap();
+pub fn decode_use_case_diagram(diagram_input: String) -> (Option<UseCaseDiagramm>, String) {
+    let diagram_input_regex = Regex::new(r"^(\w+;.*;.*;.*)$").unwrap();
     let diagram_input = diagram_input.to_string();
 
     if diagram_input_regex.is_match(diagram_input.as_ref()) {
         let use_case_diagram_comp: Vec<String> = diagram_input.split(&";".to_string()).map(|x| x.to_owned()).collect();
-        return Some(UseCaseDiagramm::new(use_case_diagram_comp[0].to_string(), decode_actors(use_case_diagram_comp[1].to_string()),
-                                         decode_use_cases(use_case_diagram_comp[2].to_string()), decode_use_case_relations(use_case_diagram_comp[3].to_string())));
+
+        let uc_actors_result = decode_actors(use_case_diagram_comp[1].to_string());
+        let uc_use_cases_result = decode_use_cases(use_case_diagram_comp[2].to_string());
+        let uc_relations_result = decode_use_case_relations(use_case_diagram_comp[3].to_string());
+
+        let errors = [[uc_actors_result.1, uc_use_cases_result.1].join(""), uc_relations_result.1].join("");
+        return (Some(UseCaseDiagramm::new(use_case_diagram_comp[0].to_string(), uc_actors_result.0,
+                                          uc_use_cases_result.0, uc_relations_result.0)), errors);
     }
-    return None;
+    return (None, "".to_string());
 }

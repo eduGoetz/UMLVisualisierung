@@ -1,0 +1,53 @@
+Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+
+---
+
+UseCase~Einweihungsfeier;
+
+1:Gast::2 6 7 8,
+3:Gastgeber:1:12 14 16,
+5:Polizei::20;
+
+2:Tanzen:,
+6:Nachschub Trinken:EP,
+7:Unterhalten:,
+8:Nachschub Essen:EP,
+12:Pizzaservice anrufen:,
+14:Feier auflösen:,
+16:Gäste hinausbegleiten:,
+20:Feier abrupt beenden:;
+
+Extends:12->6:condition {Kühlschrank leer},
+Extends:12->8:condition {Kühlschrank leer},
+Include:14->16:,
+Include:20->16:
+
+---
+
+UseCase~Verkauf;
+
+2:Verkäufer::1 5 7;
+
+1:Verkaufsposten eingeben:,
+3:Kundendaten eingeben:,
+5:fehlender Kunde:EP,
+7:Kreditwürdigkeit testen:;
+
+Extends:3->5:,
+Include:7->5:
+
+
+---
+
+UseCase~Bierzelt;
+
+2:Besucher::1 5 7 9;
+
+1:Nachschlag bestellen:,
+5:Nachschlag Reklamieren:EP,
+7:Zahlung verweigern:,
+9:Zahlung:EP;
+
+Extends:1->5:Hunger,
+Extends:9->5:Mängel vorhanden,
+Extends:7->9:Mängel nicht behoben:

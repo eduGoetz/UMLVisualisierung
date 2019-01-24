@@ -93,7 +93,7 @@ pub fn create_relations(path: &std::path::Path, image: image::ImageBuffer<Rgb<u8
                 tuple=draw_arrow(tuple.0,rel.from,rel.to,"<<extend>>");
                 anzahl=anzahl+1;
                 image=tuple.0;
-                image = draw_extend_reason(image, anzahl, "test beispiel", tuple.1, tuple.2);
+                image = draw_extend_reason(image, anzahl, &rel.note, tuple.1, tuple.2);
                 tuple.0 = image;
             }
     }
@@ -105,7 +105,7 @@ fn draw_systemborder(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>, name: &str) ->
     let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
     let schrift = Scale { x: 20.0, y: 20.0 };
     let draw_color = Rgb([0u8, 0u8, 0u8]);
-    let rect = Rect::at(200, 10).of_size(750,990);//600, 990);
+    let rect = Rect::at(200, 10).of_size(780,990);
     let mut image = image;
     let mut name = name;
     draw_hollow_rect_mut(&mut image, rect, draw_color);
@@ -657,15 +657,15 @@ fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,te
     let mut text=text;
     let mut kreis_x=kreis_x;
     let mut kreis_y=kreis_y;
-    let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans-Bold.ttf") as &[u8]);
+    let font = Vec::from(include_bytes!("../res/fonts/DejaVuSans.ttf") as &[u8]);
     let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
     let schrift = Scale { x: 13.0, y: 13.0 };
     let mut yo= 50;
     let mut yu= 100;
     let mut yh= 70;
-    let mut xl= 900 as f32;
-    let mut xm= 880 as f32;
-    let mut xk= 750;
+    let mut xl= 960 as f32;
+    let mut xm= 940 as f32;
+    let mut xk= 760;
     let mut done_create=false;
     let mut dauer=0;
     let mut gezeichnet=false;
@@ -682,8 +682,9 @@ fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,te
         draw_line_segment_mut(&mut image,(xl,yh as f32),(xm,yo as f32), Rgb([0u8, 0u8, 0u8]));
         draw_line_segment_mut(&mut image,(xm,yo as f32),(xm,yh as f32), Rgb([0u8, 0u8, 0u8]));
         draw_line_segment_mut(&mut image,(xm,yh as f32),(xl,yh as f32), Rgb([0u8, 0u8, 0u8]));
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
     }
+    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
+
     draw_line_segment_mut(&mut image,(kreis_x as f32 ,kreis_y as f32),(xk as f32,((yo+yu)/2) as f32), Rgb([0u8, 0u8, 0u8]));
 
 

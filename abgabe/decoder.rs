@@ -15,11 +15,12 @@ pub struct Model {
     pub class_file_name: String,
     pub use_case_amount: i32,
     pub use_case_file_name: String,
+    pub errors: String,
 }
 
 impl Model {
-    fn new (class_amount: i32, use_case_amount: i32, class_file_name: String, use_case_file_name: String) -> Model {
-        Model {class_amount: class_amount, use_case_amount: use_case_amount, class_file_name: class_file_name, use_case_file_name: use_case_file_name }
+    fn new (class_amount: i32, use_case_amount: i32, class_file_name: String, use_case_file_name: String, errors: String) -> Model {
+        Model {class_amount: class_amount, use_case_amount: use_case_amount, class_file_name: class_file_name, use_case_file_name: use_case_file_name, errors: errors }
     }
 }
 
@@ -27,6 +28,7 @@ impl Model {
 pub fn decode_input(given_input: String) -> Model {
     let diagram_regex = Regex::new(r"((Class|UseCase)~.*)").unwrap();
     let input = given_input.to_string();
+    let mut errors = "".to_string();
     let mut class_diagram_list = Vec::new();
     let mut use_case_diagram_list = Vec::new();
 
@@ -35,13 +37,17 @@ pub fn decode_input(given_input: String) -> Model {
         if diagram_regex.is_match(dia_str.as_ref()) {
             let diagram_components: Vec<String> = dia_str.split(&"~".to_string()).map(|x| x.to_owned()).collect();
             if diagram_components[0] == "Class" {
-                let class_return = decoder_class::decode_class_diagram(diagram_components[1].to_string());
+                let class_diagram_return = decoder_class::decode_class_diagram(diagram_components[1].to_string());
+                let class_return = class_diagram_return.0;
+                errors =  class_diagram_return.1;
                 match class_return {
                     Some(class_return) => class_diagram_list.push(class_return),
                     None => continue,
                 }
             } else if diagram_components[0] == "UseCase" {
-                let uc_return = decoder_usecase::decode_use_case_diagram(diagram_components[1].to_string());
+                let uc_diagram_return = decoder_usecase::decode_use_case_diagram(diagram_components[1].to_string());
+                let uc_return = uc_diagram_return.0;
+                errors = [errors, uc_diagram_return.1].join("");
                 match uc_return {
                     Some(uc_return) => use_case_diagram_list.push(uc_return),
                     None => continue,
@@ -50,7 +56,7 @@ pub fn decode_input(given_input: String) -> Model {
         }
     }
     let model = Model::new(class_diagram_list.len() as i32, use_case_diagram_list.len() as i32,
-                           "res/UML_class".to_string(), "res/UML_use_case".to_string());
+                           "res/UML_class".to_string(), "res/UML_use_case".to_string(), errors);
 
     for j in 0..class_diagram_list.len() {
         decoding_to_visual::call_class_draw(&class_diagram_list[j].classes, &class_diagram_list[j].relations, j as i32)
