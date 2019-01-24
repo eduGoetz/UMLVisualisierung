@@ -1,5 +1,64 @@
-﻿Class~1;Interface;IKunde;private::final:long:kundennummer,;:::void:machWas:int=nummer/4;Interface;IClient;package:static::int:num,;private:::void:machWas:/2;Class;Kunde;package::final:double:gehalt,;/3;Class;Mitarbeiter;;protected:::void:arbeiten:float=dauer double=gehalt/12;Class;Praktikant;private:static::Int:alter,;/|V;12->3;,A;1->12;
+﻿Class~8;Class;Partyteilnehmer;
 
+:::String:name,
+:::String:wohnort,
+:::geburtsdatum:Date,
+package:::Cocktail:array,
+protected:::Begeisterung:begeistert;
+
+public:::void:flirten:,
+public:::void:tanzen:,
+package:::void:trinke:Cocktail=c/
+
+
+2;Class;Feier;
+
+public:::String:anlass,
+public:::String:motto,
+public:::Date:termin,;
+
+:::void:abbrechen:/
+
+
+5;Class;Zutat;
+
+public:::Int:menge,
+public:::String:name,
+public:::Date:verfallsdatum,;/
+
+
+4;Class;Cocktail;
+
+:::String:name,
+:::zutaten:Zutat,;/
+
+
+12;Class;Barmixer;
+
+;public:::Cocktail:mixe:Zutat=z/
+
+
+6;Class;Gastgeber;
+
+:::Boolean:hektisch;
+
+:::void:begruesse:Gast=g/
+
+
+9;Class;Gast;
+
+;:::void:feiere:/|
+
+
+
+
+AG;8->2;,
+K;5->4;,
+A;5->12;,
+A;12->6;,
+gA;6->9;,
+V;6->8;,
+V;9->8;
 ---
 
 UseCase~Einweihungsfeier;
@@ -21,3 +80,40 @@ Extends:12->6:condition {Kühlschrank leer},
 Extends:12->8:condition {Kühlschrank leer},
 Include:14->16:,
 Include:20->16:
+
+---
+
+UseCase~Einweihungsfeier;
+
+1:Gast::1 2 3 4,
+2:Gastgeber:1:5 6 7,
+3:Polizei::8;
+
+1:Tanzen:,
+2:Nachschub Trinken:EP,
+3:Unterhalten:,
+4:Nachschub Essen:EP,
+5:Pizzaservice anrufen:,
+6:Feier auflösen:,
+7:Gäste hinausbegleiten:,
+8:Feier abrupt beenden:;
+
+Extends:5->2:,
+Extends:5->4:,
+Include:8->7:,
+Include:6->7:
+
+---
+
+UseCase~Bierzelt;
+
+2:Besucher::1 5 7 9;
+
+1:Nachschlag bestellen:,
+5:Nachschlag Reklamieren:EP,
+7:Zahlung verweigern:,
+9:Zahlung:EP;
+
+Extends:1->5:Hunger,
+Extends:9->5:Mängel vorhanden,
+Extends:7->9:Mängel nicht behoben:

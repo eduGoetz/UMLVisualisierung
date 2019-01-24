@@ -239,7 +239,6 @@ fn decode_classes(classes_str: String) -> (Vec<Class>, String) {
                                               class_components_vec[2].to_string(), decode_attributes(class_components_vec[3].to_string()).0,
                                               decode_methods(class_components_vec[4].to_string()).0));
         } else {
-            println!("fdfd");
             if (cla_str != "") {
                 errors = [errors, "Das Klassenlayout ist falsch, mind. 1 Klasse übersprungen.\n".to_string()].join("");
             }
@@ -300,7 +299,6 @@ fn decode_methods(methods_str: String) -> (Vec<Method>, String) {
         if met_str == "" {
             continue;
         }
-        println!("{}   {}",method_regex, met_str);
         if method_regex.is_match(met_str.as_ref()) {
             let method_components: Vec<String> = met_str.split(&":".to_string()).map(|x| x.to_owned()).collect();
 
