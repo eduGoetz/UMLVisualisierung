@@ -13,11 +13,11 @@
   * Name<br/>
   Der Name der Klasse, hier muss man sich nicht an z.B. Javakonventionen halten, sollte man aber generell.<br/>
   * Attribute<br/>
-    1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
-    2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
-    3. Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
-    4. Datentyp, kann alles mögliche sein.<br/>
-    5. Name, kann ebenfalls alles mögliche sein.<br/>
+    1.Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
+    2.Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    3.Final, wenn es nicht final ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
+    4.Datentyp, kann alles mögliche sein.<br/>
+    5.Name, kann ebenfalls alles mögliche sein.<br/>
    * Methoden<br/>
     1. Zugriffsmodifikator *public*, *protected*, *package* oder *private*.<br/>
     2. Static, wenn es nicht static ist lässt man dieses Feld leer. Auch __kein__ Leerzeichen.<br/>
