@@ -360,7 +360,7 @@ fn decode_parameters(param_str: String) -> (Vec<Parameter>, String) {
 
 
 fn decode_relations(relations_str: String) -> (Vec<Relation>, String) {
-    let relation_regex = Regex::new(r"^((V|A|gA|AG|K|I|AB);\d+->\d+;((\d+|\w+|\*):(\d+|\w+|\*))?(,)?)*$").unwrap();
+    let relation_regex = Regex::new(r"^((V|A|gA|AG|K|I|AB);\d+->\d+;((\d+|\w+|\*|\.)*:(\d+|\w+|\*|\.)*)?(,)?)*$").unwrap();
     let mut errors = "".to_string();
     let mut relations_return = Vec::new();
 

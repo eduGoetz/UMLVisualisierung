@@ -676,8 +676,8 @@ fn draw_extend_reason(image: image::ImageBuffer<Rgb<u8>, Vec<u8>>,anzahl: i32,te
         draw_line_segment_mut(&mut image,(xl,yh as f32),(xm,yo as f32), Rgb([0u8, 0u8, 0u8]));
         draw_line_segment_mut(&mut image,(xm,yo as f32),(xm,yh as f32), Rgb([0u8, 0u8, 0u8]));
         draw_line_segment_mut(&mut image,(xm,yh as f32),(xl,yh as f32), Rgb([0u8, 0u8, 0u8]));
-        draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
     }
+    draw_text_mut(&mut image, Rgb([0u8, 0u8, 0u8]),(xk+10)as u32 , (yo+10) as u32, schrift, &font, text);
     draw_line_segment_mut(&mut image,(kreis_x as f32 ,kreis_y as f32),(xk as f32,((yo+yu)/2) as f32), Rgb([0u8, 0u8, 0u8]));
 
 
