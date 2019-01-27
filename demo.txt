@@ -20,7 +20,7 @@ public:::Date:termin,;
 :::void:abbrechen:/
 
 
-5;Class;Zutat;
+6;Class;Zutat;
 
 public:::Int:menge,
 public:::String:name,
@@ -38,7 +38,7 @@ public:::Date:verfallsdatum,;/
 ;public:::Cocktail:mixe:Zutat=z/
 
 
-6;Class;Gastgeber;
+7;Class;Gastgeber;
 
 :::Boolean:hektisch;
 
@@ -52,13 +52,15 @@ public:::Date:verfallsdatum,;/
 
 
 
-AG;8->2;,
-K;5->4;,
-A;5->12;,
-A;12->6;,
-gA;6->9;,
-V;6->8;,
+AG;8->2;*:1,
+K;6->4;,
+A;6->12;,
+A;12->7;1:1,
+gA;7->9;1:1..*,
+V;7->8;,
 V;9->8;
+A;4->12;1..*:1
+
 ---
 
 UseCase~Einweihungsfeier;
@@ -83,25 +85,17 @@ Include:20->16:
 
 ---
 
-UseCase~Einweihungsfeier;
+UseCase~Verkauf;
 
-1:Gast::1 2 3 4,
-2:Gastgeber:1:5 6 7,
-3:Polizei::8;
+2:Verkäufer::1 5 7;
 
-1:Tanzen:,
-2:Nachschub Trinken:EP,
-3:Unterhalten:,
-4:Nachschub Essen:EP,
-5:Pizzaservice anrufen:,
-6:Feier auflösen:,
-7:Gäste hinausbegleiten:,
-8:Feier abrupt beenden:;
+1:Verkaufsposten eingeben:,
+3:Kundendaten eingeben:,
+5:fehlender Kunde:EP,
+7:Kreditwürdigkeit testen:;
 
-Extends:5->2:,
-Extends:5->4:,
-Include:8->7:,
-Include:6->7:
+Extends:3->5:,
+Include:7->5:
 
 ---
 
