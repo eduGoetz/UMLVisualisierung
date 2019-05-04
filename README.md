@@ -1,7 +1,7 @@
-# UML-Visualisierung - Eine Software zur Visualisierung von textuell spezifizierten UML-Diagrammen
+﻿# UML-Visualisierung - Eine Software zur Visualisierung von textuell spezifizierten UML-Diagrammen
 
 ## Getting started
-* Nach Start des Programmes kann man direkt loslegen und Eingaben tätigen
+* Nach Start des Programmes kann man direkt loslegen und Eingaben tätigen.
 
 ## Syntax
 ### Klasse
